@@ -1,0 +1,63 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\{{model}};
+use App\Http\Requests\{{model}}Request;
+use Illuminate\Http\Request;
+
+class {{model}}Controller extends Controller
+{
+    public function index()
+    {
+        ${{plural}} = {{model}}::all();
+
+        return view('{{plural}}.index', compact('{{plural}}'));
+    }
+
+    public function create()
+    {
+        return view('{{plural}}.create');
+    }
+
+    public function store({{model}}Request $request)
+    {
+        // ${{singular}}->create($request->validated());
+        {{model}}::create($request->all());
+
+        return redirect()->route('{{plural}}.index')->with('success', __('messages.created_successfully', ['model' => '{{model}}']));
+    }
+
+    public function show(string $id)
+    {
+        ${{singular}} = {{model}}::findOrFail($id);
+
+        return view('{{plural}}.show', compact('{{singular}}'));
+    }
+
+    public function edit(string $id)
+    {
+        ${{singular}} = {{model}}::findOrFail($id);
+
+        return view('{{plural}}.edit', compact('{{singular}}'));
+    }
+
+    public function update({{model}}Request $request, string $id)
+    {
+        ${{singular}} = {{model}}::findOrFail($id);
+    //    ${{singular}}->update($request->validated());
+        ${{singular}}->update($request->all());
+
+        return redirect()->route('{{plural}}.index')->with('success', __('messages.updated_successfully', ['model' => '{{model}}']));
+    }
+
+    public function destroy(string $id)
+    {
+        ${{singular}}  = {{model}}::find($id);
+        if (${{singular}}) {
+            ${{singular}}->delete();
+        }
+
+        return redirect()->route('{{plural}}.index')->with('success', __('messages.deleted_successfully', ['model' => '{{model}}']));
+    }
+}

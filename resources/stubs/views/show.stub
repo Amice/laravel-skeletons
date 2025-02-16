@@ -1,0 +1,9 @@
+@extends('layouts.app')
+
+@section('content')
+    <div class="container">
+        <h1>{{ __('messages.details_of') }} {{ __('messages.{{singular}}') }}</h1>
+        <p><strong>{{ __('messages.name') }}:</strong> {{ ${{singular}}->name }}</p>
+        <a href="{{ route('{{plural}}.index') }}" class="btn btn-secondary">{{ __('messages.back') }}</a>
+    </div>
+@endsection

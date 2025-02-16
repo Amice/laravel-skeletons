@@ -1,0 +1,33 @@
+@extends('layouts.app')
+
+@section('content')
+    <div class="container">
+        <h1>{{ __('messages.list_of') }} {{ __('messages.{{plural}}') }}</h1>
+        <a href="{{ route('{{plural}}.create') }}" class="btn btn-primary">{{ __('messages.create_new') }}</a>
+        <table class="table mt-3">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>{{ __('messages.name') }}</th>
+                    <th>{{ __('messages.actions') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (${{plural}} as ${{singular}})
+                    <tr>
+                        <td>{{ ${{singular}}->id }}</td>
+                        <td>{{ ${{singular}}->name }}</td>
+                        <td>
+                            <a href="{{ route('{{plural}}.edit', ${{singular}}) }}" class="btn btn-warning">{{ __('messages.edit') }}</a>
+                            <form action="{{ route('{{plural}}.destroy', ${{singular}}) }}" method="POST" style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger">{{ __('messages.delete') }}</button>
+                            </form>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+@endsection
