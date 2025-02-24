@@ -1,0 +1,15 @@
+@extends('layouts.app')
+
+@section('content')
+    <div class="container">
+        <h1>{{ __('messages.create_new') }} {{ __('messages.{{singular}}') }}</h1>
+        <form action="{{ route('{{plural}}.store') }}" method="POST">
+            @csrf
+            <div class="form-group">
+                <label for="name">{{ __('messages.name') }}</label>
+                <input type="text" name="name" id="name" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-success mt-3">{{ __('messages.save') }}</button>
+        </form>
+    </div>
+@endsection

@@ -1,0 +1,31 @@
+{
+    "name": "laci/skeletons",
+    "description": "An artisan command to make skeletons with content for a Laravel application.",
+    "keywords": ["laravel", "package", "skeletons", "generator"],
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kovács László",
+            "email": "laci007@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.0",
+        "illuminate/console": "^10.0",
+        "illuminate/support": "^10.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Laci\\Skeletons\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Laci\\Skeletons\\SkeletonsServiceProvider"
+            ]
+        }
+    },
+
+}
