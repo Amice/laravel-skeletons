@@ -123,7 +123,7 @@ class SkeletonsGenerator extends Command
 
     protected function generateViews($singular, $plural)
     {
-        $viewPath = base_path($this->templatesPath . "views/{$plural}");
+        $viewPath = resource_path("views/{$plural}");
         File::makeDirectory($viewPath, 0777, true, true);
 
         foreach (['index', 'create', 'edit', 'show'] as $view) {
