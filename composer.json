@@ -1,7 +1,7 @@
 {
-    "name": "laci/skeletons",
+    "name": "laci/laravel-skeletons",
     "description": "An artisan command to make skeletons with content for a Laravel application.",
-    "version": "1.0.1.1",
+    "version": "1.0.1.4",
     "keywords": ["laravel", "package", "skeletons", "generator"],
     "type": "library",
     "license": "MIT",
@@ -15,7 +15,7 @@
     "prefer-stable": true,
     "autoload": {
         "psr-4": {
-            "Laci\\Skeletons\\": "src/"
+            "Laci\\LaravelSkeletons\\": "src/"
         }
     },
     "require": {
@@ -33,7 +33,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Laci\\Skeletons\\SkeletonsServiceProvider"
+                "Laci\\LaravelSkeletons\\SkeletonsServiceProvider"
             ]
         },
         "branch-alias": {

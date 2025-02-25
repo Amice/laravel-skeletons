@@ -1,6 +1,6 @@
 <?php
 
-namespace Laci\Skeletons\Console\Commands;
+namespace Laci\LaravelSkeletons\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
