@@ -20,6 +20,11 @@ class SkeletonsGenerator extends Command
 
     private $templatesPath = 'vendor/laci/skeletons/resources/stubs/';
 
+    function __construct()
+    {
+        $this->templatesPath = config('skeletons.path');
+    }
+
     public function handle()
     {
         $singular = Str::lower($this->argument('singular'));
