@@ -13,21 +13,31 @@
     ],
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "require": {
-        "php": ">=8.0",
-        "illuminate/console": "^10.0",
-        "illuminate/support": "^10.0"
-    },
     "autoload": {
         "psr-4": {
             "Laci\\Skeletons\\": "src/"
         }
     },
+    "require": {
+        "php": ">=8.0"
+    },
+    "suggest": {
+        "illuminate/console": "Required for command-line features",
+        "illuminate/support": "Provides helper functions"
+    },
+    "require-dev": {
+        "illuminate/console": "^10.0|^11.0",
+        "illuminate/support": "^10.0|^11.0"
+    },
+
     "extra": {
         "laravel": {
             "providers": [
                 "Laci\\Skeletons\\SkeletonsServiceProvider"
             ]
+        },
+        "branch-alias": {
+            "dev-main": "1.x-dev"
         }
     }
 }
