@@ -1,6 +1,6 @@
 <?php
 
-namespace Laci\LaravelSkeletons;
+namespace KovacsLaci\LaravelSkeletons;
 
 use Illuminate\Support\ServiceProvider;
 use Laci\Skeletons\Console\Commands\SkeletonsGenerator;
