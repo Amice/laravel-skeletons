@@ -18,6 +18,8 @@ class SkeletonsGenerator extends Command
 
     protected $description = 'Generate or remove Controller, Model, Request, Migration, Seeder, Views, and Routes for a given model.';
 
+    private $templatesPath = 'vendor/laci/skeletons/resources/stubs/';
+
     public function handle()
     {
         $singular = Str::lower($this->argument('singular'));
@@ -49,20 +51,30 @@ class SkeletonsGenerator extends Command
         $this->info("✅ web.php has been updated successfully!");
     }
 
+//    protected function generateController($model, $singular, $plural)
+//    {
+//        $this->createFile(
+//            app_path("Http/Controllers/{$model}Controller.php"),
+//            resource_path('stubs/controller.stub'),
+//            ['{{model}}' => $model, '{{singular}}' => $singular, '{{plural}}' => $plural]
+//        );
+//    }
+
     protected function generateController($model, $singular, $plural)
     {
         $this->createFile(
             app_path("Http/Controllers/{$model}Controller.php"),
-            resource_path('stubs/controller.stub'),
+            base_path($this->templatesPath . 'controller.stub'),
             ['{{model}}' => $model, '{{singular}}' => $singular, '{{plural}}' => $plural]
         );
     }
+
 
     protected function generateModel($model)
     {
         $this->createFile(
             app_path("Models/{$model}.php"),
-            resource_path('stubs/model.stub'),
+            base_path($this->templatesPath . 'model.stub'),
             ['{{model}}' => $model]
         );
     }
@@ -71,7 +83,7 @@ class SkeletonsGenerator extends Command
     {
         $this->createFile(
             app_path("Http/Requests/{$model}Request.php"),
-            resource_path('stubs/request.stub'),
+            base_path($this->templatesPath . 'request.stub'),
             ['{{model}}' => $model]
         );
     }
@@ -96,7 +108,7 @@ class SkeletonsGenerator extends Command
             $filename = database_path("migrations/{$timestamp}_create_{$plural}_table.php");
         }
 
-        $this->createFile($filename, resource_path('stubs/migration.stub'), ['{{plural}}' => $plural]);
+        $this->createFile($filename, base_path($this->templatesPath . 'migration.stub'), ['{{plural}}' => $plural]);
     }
 
 
@@ -104,20 +116,20 @@ class SkeletonsGenerator extends Command
     {
         $this->createFile(
             database_path("seeders/{$model}Seeder.php"),
-            resource_path('stubs/seeder.stub'),
+            base_path($this->templatesPath . 'seeder.stub'),
             ['{{model}}' => $model, '{{plural}}' => $plural]
         );
     }
 
     protected function generateViews($singular, $plural)
     {
-        $viewPath = resource_path("views/{$plural}");
+        $viewPath = base_path($this->templatesPath . "views/{$plural}");
         File::makeDirectory($viewPath, 0777, true, true);
 
         foreach (['index', 'create', 'edit', 'show'] as $view) {
             $this->createFile(
                 "$viewPath/{$view}.blade.php",
-                resource_path("stubs/views/{$view}.stub"),
+                base_path($this->templatesPath . "views/{$view}.stub"),
                 ['{{singular}}' => $singular, '{{plural}}' => $plural]
             );
         }
