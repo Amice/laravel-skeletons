@@ -3,7 +3,8 @@
 namespace KovacsLaci\LaravelSkeletons;
 
 use Illuminate\Support\ServiceProvider;
-use Laci\Skeletons\Console\Commands\SkeletonsGenerator;
+use KovacsLaci\LaravelSkeletons\Console\Commands\SkeletonsGenerator;
+
 
 class SkeletonsServiceProvider extends ServiceProvider
 {
