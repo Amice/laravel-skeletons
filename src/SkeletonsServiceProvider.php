@@ -30,5 +30,9 @@ class SkeletonsServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../resources/lang' => resource_path('lang/vendor/skeletons'),
         ], 'skeletons-lang');
+
+        $this->publishes([
+            __DIR__ . '/../config/skeletons.php' => config_path('skeletons.php'),
+        ]);
     }
 }

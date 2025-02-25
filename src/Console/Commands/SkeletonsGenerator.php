@@ -51,30 +51,43 @@ class SkeletonsGenerator extends Command
         $this->info("✅ web.php has been updated successfully!");
     }
 
+//    protected function generateController($model, $singular, $plural)
+//    {
+//        $this->createFile(
+//            app_path("Http/Controllers/{$model}Controller.php"),
+//            base_path($this->templatesPath . 'controller.stub'),
+//            ['{{model}}' => $model, '{{singular}}' => $singular, '{{plural}}' => $plural]
+//        );
+//    }
+
     protected function generateController($model, $singular, $plural)
     {
+        $stub = config('skeletons.controller');
         $this->createFile(
             app_path("Http/Controllers/{$model}Controller.php"),
-            base_path($this->templatesPath . 'controller.stub'),
+            $stub,
             ['{{model}}' => $model, '{{singular}}' => $singular, '{{plural}}' => $plural]
         );
     }
 
-
     protected function generateModel($model)
     {
+        $stub = config('skeletons.model');
         $this->createFile(
             app_path("Models/{$model}.php"),
-            base_path($this->templatesPath . 'model.stub'),
+//            base_path($this->templatesPath . 'model.stub'),
+            $stub,
             ['{{model}}' => $model]
         );
     }
 
     protected function generateRequest($model)
     {
+        $stub = config('skeletons.request');
         $this->createFile(
             app_path("Http/Requests/{$model}Request.php"),
-            base_path($this->templatesPath . 'request.stub'),
+//            base_path($this->templatesPath . 'request.stub'),
+            $stub,
             ['{{model}}' => $model]
         );
     }
@@ -98,16 +111,19 @@ class SkeletonsGenerator extends Command
             $timestamp = date('Y_m_d_His');
             $filename = database_path("migrations/{$timestamp}_create_{$plural}_table.php");
         }
-
-        $this->createFile($filename, base_path($this->templatesPath . 'migration.stub'), ['{{plural}}' => $plural]);
+        $stub = config('skeletons.migration');
+//        $this->createFile($filename, base_path($this->templatesPath . 'migration.stub'), ['{{plural}}' => $plural]);
+        $this->createFile($filename, $stub, ['{{plural}}' => $plural]);
     }
 
 
     protected function generateSeeder($model, $plural)
     {
+        $stub = config('skeletons.seeder');
         $this->createFile(
             database_path("seeders/{$model}Seeder.php"),
-            base_path($this->templatesPath . 'seeder.stub'),
+//            base_path($this->templatesPath . 'seeder.stub'),
+            $stub,
             ['{{model}}' => $model, '{{plural}}' => $plural]
         );
     }
@@ -118,9 +134,11 @@ class SkeletonsGenerator extends Command
         File::makeDirectory($viewPath, 0777, true, true);
 
         foreach (['index', 'create', 'edit', 'show'] as $view) {
+            $stub = config("skeletons.view.{$view}");
             $this->createFile(
                 "$viewPath/{$view}.blade.php",
-                base_path($this->templatesPath . "views/{$view}.stub"),
+//                base_path($this->templatesPath . "views/{$view}.stub"),
+                $stub,
                 ['{{singular}}' => $singular, '{{plural}}' => $plural]
             );
         }
