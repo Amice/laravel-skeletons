@@ -125,6 +125,11 @@ class SkeletonsGenerator extends Command
 
     protected function createFile($filePath, $stubPath, $replacements)
     {
+        $directory = dirname($filePath);
+        if (!File::exists($directory)) {
+            File::makeDirectory($directory, 0755, true);
+        }
+
         if (File::exists($filePath) && !$this->option('force')) {
             $this->warn("Skipping: {$filePath} already exists.");
             return;
