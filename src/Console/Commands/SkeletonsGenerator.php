@@ -1,6 +1,6 @@
 <?php
 
-namespace Laci\Skeletons\Console\Commands;
+namespace KovacsLaci\LaravelSkeletons\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
@@ -18,7 +18,7 @@ class SkeletonsGenerator extends Command
 
     protected $description = 'Generate or remove Controller, Model, Request, Migration, Seeder, Views, and Routes for a given model.';
 
-    private $templatesPath = 'vendor/laci/skeletons/resources/stubs/';
+    private $templatesPath = 'vendor/kovacs-laci/laravel-skeletons/resources/stubs/';
 
     public function handle()
     {
