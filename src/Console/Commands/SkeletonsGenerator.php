@@ -1,6 +1,5 @@
 <?php
 
-namespace KovacsLaci\LaravelSkeletons\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
@@ -60,7 +59,6 @@ class SkeletonsGenerator extends Command
         );
     }
 
-
     protected function generateModel($model)
     {
         $this->createFile(
@@ -99,7 +97,6 @@ class SkeletonsGenerator extends Command
             $filename = database_path("migrations/{$timestamp}_create_{$plural}_table.php");
         }
 
-        $this->createFile($filename, base_path($this->templatesPath . 'migration.stub'), ['{{plural}}' => $plural]);
     }
 
 
@@ -128,6 +125,11 @@ class SkeletonsGenerator extends Command
 
     protected function createFile($filePath, $stubPath, $replacements)
     {
+        $directory = dirname($filePath);
+        if (!File::exists($directory)) {
+            File::makeDirectory($directory, 0755, true);
+        }
+
         if (File::exists($filePath) && !$this->option('force')) {
             $this->warn("Skipping: {$filePath} already exists.");
             return;
