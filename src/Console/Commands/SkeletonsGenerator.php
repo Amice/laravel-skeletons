@@ -96,6 +96,11 @@ class SkeletonsGenerator extends Command
         } else {
             $timestamp = date('Y_m_d_His');
             $filename = database_path("migrations/{$timestamp}_create_{$plural}_table.php");
+            $this->createFile(
+                $filename,
+                base_path($this->templatesPath . 'migration.stub'),
+                ['{{plural}}' => $plural]
+            );
         }
 
     }
