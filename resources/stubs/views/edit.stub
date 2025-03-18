@@ -2,15 +2,16 @@
 
 @section('content')
     <div class="container">
-        <h1>{{ __('messages.edit') }} {{ __('messages.{{singular}}') }}</h1>
+        <h1>{{ __('skeletons.edit') }} {{singular}}</h1>
         <form action="{{ route('{{plural}}.update', ${{singular}}) }}" method="POST">
             @csrf
             @method('PUT')
             <div class="form-group">
-                <label for="name">{{ __('messages.name') }}</label>
+                <label for="name">{{ __('skeletons.name') }}</label>
                 <input type="text" name="name" id="name" class="form-control" value="{{ ${{singular}}->name }}" required>
             </div>
-            <button type="submit" class="btn btn-success mt-3">{{ __('messages.update') }}</button>
+            <button type="submit" class="btn btn-save mt-3">{{ __('skeletons.save') }}</button>
+            <a href="{{ route('{{plural}}.index') }}">{{ __('skeletons.cancel') }}</a>
         </form>
     </div>
 @endsection

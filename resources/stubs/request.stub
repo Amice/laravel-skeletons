@@ -27,8 +27,8 @@ class {{model}}Request extends FormRequest
     public function messages()
     {
         return [
-            'name.required' => __('messages.name_required'),
-            'name.max' => __('messages.name_max_length'),
+            'name.required' => __('skeletons.name_required'),
+            'name.max' => __('skeletons.name_max_length'),
         ];
     }
 }

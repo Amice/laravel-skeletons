@@ -25,7 +25,7 @@ class {{model}}Controller extends Controller
         // ${{singular}}->create($request->validated());
         {{model}}::create($request->all());
 
-        return redirect()->route('{{plural}}.index')->with('success', __('messages.created_successfully', ['model' => '{{model}}']));
+        return redirect()->route('{{plural}}.index')->with('success', __('skeletons.created_successfully', ['model' => '{{model}}']));
     }
 
     public function show(string $id)
@@ -48,7 +48,7 @@ class {{model}}Controller extends Controller
     //    ${{singular}}->update($request->validated());
         ${{singular}}->update($request->all());
 
-        return redirect()->route('{{plural}}.index')->with('success', __('messages.updated_successfully', ['model' => '{{model}}']));
+        return redirect()->route('{{plural}}.index')->with('success', __('skeletons.updated_successfully', ['model' => '{{model}}']));
     }
 
     public function destroy(string $id)
@@ -58,6 +58,6 @@ class {{model}}Controller extends Controller
             ${{singular}}->delete();
         }
 
-        return redirect()->route('{{plural}}.index')->with('success', __('messages.deleted_successfully', ['model' => '{{model}}']));
+        return redirect()->route('{{plural}}.index')->with('success', __('skeletons.deleted_successfully', ['model' => '{{model}}']));
     }
 }
