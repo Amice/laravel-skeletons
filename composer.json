@@ -1,7 +1,7 @@
 {
     "name": "kovacs-laci/laravel-skeletons",
     "description": "An artisan command to make skeletons with content for a Laravel application.",
-    "version": "1.0.0.5",
+    "version": "^1.0.0.0",
     "keywords": ["laravel", "package", "skeletons", "generator"],
     "type": "library",
     "license": "MIT",

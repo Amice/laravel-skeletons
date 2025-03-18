@@ -131,6 +131,12 @@ class SkeletonsGenerator extends Command
                 ['{{singular}}' => $singular, '{{plural}}' => $plural]
             );
         }
+
+        $sourceFile = base_path($this->templatesPath . "views/layout.example.stub");
+        $layoutsPath = resource_path("views" .DIRECTORY_SEPARATOR. "layouts");
+        $destinationFile = $layoutsPath . DIRECTORY_SEPARATOR . "example.app.blade.php";
+        File::ensureDirectoryExists($layoutsPath);
+        File::copy($sourceFile, $destinationFile);
     }
 
     protected function copyLocalizationFiles()
