@@ -10,4 +10,6 @@ class {{model}} extends EloquentModel
     use HasFactory;
 
     protected $fillable = ['name'];
+
+    protected $table = {{plural}}
 }

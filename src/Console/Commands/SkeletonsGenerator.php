@@ -41,7 +41,7 @@ class SkeletonsGenerator extends Command
         Log::info("Generating files for: $model");
 
         $this->generateController($model, $singular, $plural);
-        $this->generateModel($model);
+        $this->generateModel($model, $plural);
         $this->generateRequest($model);
         $this->generateMigration($singular, $plural);
         $this->generateSeeder($model, $plural);
@@ -64,12 +64,12 @@ class SkeletonsGenerator extends Command
         );
     }
 
-    protected function generateModel($model)
+    protected function generateModel($model, $plural)
     {
         $this->createFile(
             app_path("Models/{$model}.php"),
             base_path($this->templatesPath . 'model.stub'),
-            ['{{model}}' => $model]
+            ['{{model}}' => $model, '{{plural}}' => $plural]
         );
     }
 
