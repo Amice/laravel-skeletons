@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 
 class SkeletonsGenerator extends Command
 {
+    const BASE_PATH = 'vendor/kovacs-laci/laravel-skeletons/';
     protected $signature = 'app:make-skeletons {singular} {plural}
                            {--with-auth : Routes will be generated with middleware}
                            {--force : Overwrite all existing files}
@@ -18,7 +19,7 @@ class SkeletonsGenerator extends Command
 
     protected $description = 'Generate or remove Controller, Model, Request, Migration, Seeder, Views, and Routes for a given model.';
 
-    private $templatesPath = 'vendor/kovacs-laci/laravel-skeletons/resources/stubs/';
+    private $templatesPath = self::BASE_PATH . 'resources/stubs/';
 
     public function handle()
     {
@@ -45,10 +46,13 @@ class SkeletonsGenerator extends Command
         $this->generateMigration($singular, $plural);
         $this->generateSeeder($model, $plural);
         $this->generateViews($singular, $plural);
-
         $this->info("✅ All files generated successfully!");
+
         $this->addRoutes($singular, $plural);
         $this->info("✅ web.php has been updated successfully!");
+
+        $this->copyLocalizationFiles();
+        $this->info("✅ Language files have been created successfully!");
     }
 
     protected function generateController($model, $singular, $plural)
@@ -126,6 +130,32 @@ class SkeletonsGenerator extends Command
                 base_path($this->templatesPath . "views/{$view}.stub"),
                 ['{{singular}}' => $singular, '{{plural}}' => $plural]
             );
+        }
+    }
+
+    protected function copyLocalizationFiles()
+    {
+        $sourcePath = self::BASE_PATH . 'resources' . DIRECTORY_SEPARATOR . 'lang';
+        $destinationPath = resource_path('lang');
+
+        // Ensure the source directory exists
+        if (File::isDirectory($sourcePath)) {
+            // Get all files and subdirectories from the source
+            $items = File::allFiles($sourcePath);
+
+            foreach ($items as $file) {
+                $relativePath = $file->getRelativePathname(); // Get the relative path of the file
+                $destinationFile = $destinationPath . DIRECTORY_SEPARATOR . $relativePath;
+
+                // Check if the file already exists in the destination
+                if (!File::exists($destinationFile)) {
+                    // Ensure the destination subdirectory exists
+                    File::ensureDirectoryExists(dirname($destinationFile));
+
+                    // Copy the file
+                    File::copy($file->getPathname(), $destinationFile);
+                }
+            }
         }
     }
 
