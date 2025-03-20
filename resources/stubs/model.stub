@@ -11,5 +11,5 @@ class {{model}} extends EloquentModel
 
     protected $fillable = ['name'];
 
-    protected $table = {{plural}}
+    protected $table = {{plural}};
 }
