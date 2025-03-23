@@ -216,6 +216,13 @@ class SkeletonsGenerator extends Command
             }
         }
 
+        self::deleteMigrations($plural, $purge);
+        self::deleteViews($singular, $purge);
+        self::deleteLanguages($purge);
+    }
+
+    private function deleteMigrations($plural, $purge)
+    {
         foreach (glob(database_path("migrations/*_create_{$plural}_table.php")) as $migration) {
             if (File::exists($migration)) {
                 File::delete($migration);
@@ -229,7 +236,10 @@ class SkeletonsGenerator extends Command
                 }
             }
         }
+    }
 
+    private function deleteViews($plural, $purge)
+    {
         $viewPath = resource_path("views/{$plural}");
         if (File::exists($viewPath)) {
             if ($purge) {
@@ -244,6 +254,23 @@ class SkeletonsGenerator extends Command
         }
     }
 
+    private function deleteLanguages($purge, $languages = ['en', 'hu'])
+    {
+        foreach ($languages as $language) {
+            $langSkeletonsPath = resource_path("lang" . DIRECTORY_SEPARATOR . $language . DIRECTORY_SEPARATOR . "skeletons.php");
+            if (File::exists($langSkeletonsPath)) {
+                File::delete($langSkeletonsPath);
+                $this->info("❌ Deleted language file: $langSkeletonsPath");
+                if ($purge) {
+                    $bakFile = $langSkeletonsPath . '.bak';
+                    if (File::exists($bakFile)) {
+                        File::delete($bakFile);
+                        $this->info("❌ Deleted: {$bakFile}");
+                    }
+                }
+            }
+        }
+    }
     private function addRoutes(string $singular, string $plural)
     {
         $webPhpPath = base_path('routes/web.php');
