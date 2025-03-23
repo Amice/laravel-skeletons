@@ -203,6 +203,7 @@ class SkeletonsGenerator extends Command
         ];
 
         foreach ($files as $file) {
+            $file = str_replace('/', DIRECTORY_SEPARATOR, $file);
             if (File::exists($file)) {
                 File::delete($file);
                 $this->info("❌ Deleted: {$file}");
@@ -217,7 +218,7 @@ class SkeletonsGenerator extends Command
         }
 
         self::deleteMigrations($plural, $purge);
-        self::deleteViews($singular, $purge);
+        self::deleteViews($plural, $purge);
         self::deleteLanguages($purge);
         self::removeRoutes($singular);
     }
