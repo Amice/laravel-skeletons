@@ -19,7 +19,16 @@ class SkeletonsGenerator extends Command
 
     protected $description = 'Generate or remove Controller, Model, Request, Migration, Seeder, Views, and Routes for a given model.';
 
-    private $templatesPath = self::BASE_PATH . 'resources/stubs/';
+    private $templatesPath;
+
+    private $basePath;
+
+    function __construct($basePath = self::BASE_PATH, $templatesPath = 'resources/stubs/')
+    {
+        parent::__construct();
+        $this->basePath = str_replace('/', DIRECTORY_SEPARATOR, $basePath);
+        $this->templatesPath = base_path($this->basePath) . str_replace('/', DIRECTORY_SEPARATOR, $templatesPath);
+    }
 
     public function handle()
     {
@@ -57,34 +66,40 @@ class SkeletonsGenerator extends Command
 
     protected function generateController($model, $singular, $plural)
     {
+        $destination = str_replace('/', DIRECTORY_SEPARATOR, app_path("Http/Controllers/{$model}Controller.php"));
+        $source = str_replace('/', DIRECTORY_SEPARATOR, $this->templatesPath . 'controller.stub');
         $this->createFile(
-            app_path("Http/Controllers/{$model}Controller.php"),
-            base_path($this->templatesPath . 'controller.stub'),
+            $destination,
+            $source,
             ['{{model}}' => $model, '{{singular}}' => $singular, '{{plural}}' => $plural]
         );
     }
 
     protected function generateModel($model, $plural)
     {
+        $destination = str_replace('/', DIRECTORY_SEPARATOR, app_path("Models/{$model}.php"));
+        $source = str_replace('/', DIRECTORY_SEPARATOR, $this->templatesPath . 'model.stub');
         $this->createFile(
-            app_path("Models/{$model}.php"),
-            base_path($this->templatesPath . 'model.stub'),
+            $destination,
+            $source,
             ['{{model}}' => $model, '{{plural}}' => $plural]
         );
     }
 
     protected function generateRequest($model)
     {
+        $destination = str_replace('/', DIRECTORY_SEPARATOR, app_path("Http/Requests/{$model}Request.php"));
+        $source = str_replace('/', DIRECTORY_SEPARATOR, $this->templatesPath . 'request.stub');
         $this->createFile(
-            app_path("Http/Requests/{$model}Request.php"),
-            base_path($this->templatesPath . 'request.stub'),
+            $destination,
+            $source,
             ['{{model}}' => $model]
         );
     }
 
     protected function generateMigration($singular, $plural)
     {
-        $existingMigrations = glob(database_path("migrations/*_create_{$plural}_table.php"));
+        $existingMigrations = glob(database_path("migrations" . DIRECTORY_SEPARATOR . "*_create_{$plural}_table.php"));
         if (!empty($existingMigrations)) {
             $filename = reset($existingMigrations);
             if ($this->option('with-backup')) {
@@ -102,7 +117,7 @@ class SkeletonsGenerator extends Command
             $filename = database_path("migrations/{$timestamp}_create_{$plural}_table.php");
             $this->createFile(
                 $filename,
-                base_path($this->templatesPath . 'migration.stub'),
+                $this->templatesPath . 'migration.stub',
                 ['{{plural}}' => $plural]
             );
         }
@@ -112,28 +127,32 @@ class SkeletonsGenerator extends Command
 
     protected function generateSeeder($model, $plural)
     {
+        $destination = str_replace('/', DIRECTORY_SEPARATOR, database_path("seeders/{$model}Seeder.php"));
+        $source = str_replace('/', DIRECTORY_SEPARATOR, $this->templatesPath . 'seeder.stub');
         $this->createFile(
-            database_path("seeders/{$model}Seeder.php"),
-            base_path($this->templatesPath . 'seeder.stub'),
+            $destination,
+            $source,
             ['{{model}}' => $model, '{{plural}}' => $plural]
         );
     }
 
     protected function generateViews($singular, $plural)
     {
-        $viewPath = resource_path("views/{$plural}");
+        $viewPath = resource_path("views" .DIRECTORY_SEPARATOR . $plural);
         File::makeDirectory($viewPath, 0777, true, true);
 
         foreach (['index', 'create', 'edit', 'show'] as $view) {
+            $destination = str_replace('/', DIRECTORY_SEPARATOR, "$viewPath/{$view}.blade.php");
+            $source = str_replace('/', DIRECTORY_SEPARATOR, $this->templatesPath . "views/{$view}.stub");
             $this->createFile(
-                "$viewPath/{$view}.blade.php",
-                base_path($this->templatesPath . "views/{$view}.stub"),
+                $destination,
+                $source,
                 ['{{singular}}' => $singular, '{{plural}}' => $plural]
             );
         }
 
-        $sourceFile = base_path($this->templatesPath . "views/layout.example.stub");
-        $layoutsPath = resource_path("views" .DIRECTORY_SEPARATOR. "layouts");
+        $sourceFile = str_replace('/', DIRECTORY_SEPARATOR,  $this->templatesPath . "views/layout.example.stub");
+        $layoutsPath = resource_path("views" . DIRECTORY_SEPARATOR . "layouts");
         $destinationFile = $layoutsPath . DIRECTORY_SEPARATOR . "example.app.blade.php";
         File::ensureDirectoryExists($layoutsPath);
         File::copy($sourceFile, $destinationFile);
@@ -141,7 +160,7 @@ class SkeletonsGenerator extends Command
 
     protected function copyLocalizationFiles()
     {
-        $sourcePath = self::BASE_PATH . 'resources' . DIRECTORY_SEPARATOR . 'lang';
+        $sourcePath = $this->basePath . 'resources' . DIRECTORY_SEPARATOR . 'lang';
         $destinationPath = resource_path('lang');
 
         // Ensure the source directory exists
