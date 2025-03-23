@@ -240,13 +240,14 @@ class SkeletonsGenerator extends Command
 
     private function deleteViews($plural, $purge)
     {
-        $viewPath = resource_path("views/{$plural}");
+        $viewPath = resource_path("views" . DIRECTORY_SEPARATOR . $plural);
         if (File::exists($viewPath)) {
             if ($purge) {
                 File::deleteDirectory($viewPath);
                 $this->info("❌ Deleted views directory: $viewPath");
             } else {
-                foreach (glob("{$viewPath}/*.blade.php") as $viewFile) {
+                $viewFiles = glob($viewPath . DIRECTORY_SEPARATOR . "*.blade.php");
+                foreach ($viewFiles as $viewFile) {
                     File::delete($viewFile);
                     $this->info("❌ Deleted: {$viewFile}");
                 }
