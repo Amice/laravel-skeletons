@@ -219,6 +219,7 @@ class SkeletonsGenerator extends Command
         self::deleteMigrations($plural, $purge);
         self::deleteViews($singular, $purge);
         self::deleteLanguages($purge);
+        self::removeRoutes($singular);
     }
 
     private function deleteMigrations($plural, $purge)
@@ -274,7 +275,7 @@ class SkeletonsGenerator extends Command
     }
     private function addRoutes(string $singular, string $plural)
     {
-        $webPhpPath = base_path('routes/web.php');
+        $webPhpPath = base_path('routes' . DIRECTORY_SEPARATOR . 'web.php');
         if (!File::exists($webPhpPath)) {
             $this->error("web.php not found.");
             Log::error("web.php not found.");
@@ -289,7 +290,6 @@ class SkeletonsGenerator extends Command
 
         // Check if the `use` statement already exists to avoid duplication
         if (!str_contains($webPhpContent, $useStatement)) {
-//            $webPhpContent = "<?php\n\n$useStatement\n" . ltrim($webPhpContent);
             $webPhpContent = str_replace("<?php\n", "<?php\n\n$useStatement\n", $webPhpContent);
         }
 
@@ -301,27 +301,37 @@ class SkeletonsGenerator extends Command
 
         $webPhpContent .= "\n" . $routeDefinition . "\n";
         File::put($webPhpPath, $webPhpContent);
-//        File::append($webPhpPath, "\n" . $routeDefinition . "\n");
         $this->info("Added route to web.php: $routeDefinition");
         Log::info("Added new route: $routeDefinition");
     }
 
-    private function removeRoutes(string $singular, string $plural)
+    private function removeRoutes(string $singular)
     {
-        $webPhpPath = base_path('routes/web.php');
+        $webPhpPath = base_path('routes' . DIRECTORY_SEPARATOR . 'web.php');
         if (!File::exists($webPhpPath)) {
+            $msg = "$webPhpPath not found.";
+            $this->info($msg);
+            Log::info($msg);
             return;
         }
 
-        $webPhpContent = File::get($webPhpPath);
-        $routeDefinition = $this->getRouteDefinitions($singular, $plural);
+        $ucSingular = ucfirst($singular);
+        $controllerClass = "{$ucSingular}Controller::class";
 
-        if (str_contains($webPhpContent, $routeDefinition)) {
-            $webPhpContent = str_replace($routeDefinition . "\n", '', $webPhpContent);
-            File::put($webPhpPath, $webPhpContent);
-            $this->info("Removed route from web.php: $routeDefinition");
-            Log::info("Removed route: $routeDefinition");
+        // Open the file and read line by line
+        $lines = File::lines($webPhpPath);
+        $filteredLines = [];
+
+        foreach ($lines as $line) {
+            // Add the line only if it doesn't contain the search string
+            if (strpos($line, $controllerClass) === false) {
+                $filteredLines[] = $line;
+            }
         }
+
+        // Save the filtered content back to the file
+        File::put($webPhpPath, implode(PHP_EOL, $filteredLines));
+        $this->info("Routes from web.php removed.");
     }
 
     private function getRouteDefinitions(string $singular, string $plural)
