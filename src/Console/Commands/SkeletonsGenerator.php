@@ -329,9 +329,11 @@ class SkeletonsGenerator extends Command
             }
         }
 
-        // Save the filtered content back to the file
-        File::put($webPhpPath, implode(PHP_EOL, $filteredLines));
-        $this->info("Routes from web.php removed.");
+        if (count($filteredLines) < count($lines)) {
+            // Save the filtered content back to the file
+            File::put($webPhpPath, implode(PHP_EOL, $filteredLines));
+            $this->info("Routes from web.php removed.");
+        }
     }
 
     private function getRouteDefinitions(string $singular, string $plural)
