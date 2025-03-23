@@ -99,7 +99,8 @@ class SkeletonsGenerator extends Command
 
     protected function generateMigration($singular, $plural)
     {
-        $existingMigrations = glob(database_path("migrations" . DIRECTORY_SEPARATOR . "*_create_{$plural}_table.php"));
+        $migrationsPath = database_path("migrations" . DIRECTORY_SEPARATOR);
+        $existingMigrations = glob($migrationsPath . "*_create_{$plural}_table.php");
         if (!empty($existingMigrations)) {
             $filename = reset($existingMigrations);
             if ($this->option('with-backup')) {
@@ -114,7 +115,7 @@ class SkeletonsGenerator extends Command
             }
         } else {
             $timestamp = date('Y_m_d_His');
-            $filename = database_path("migrations/{$timestamp}_create_{$plural}_table.php");
+            $filename = $migrationsPath . "migrations/{$timestamp}_create_{$plural}_table.php";
             $this->createFile(
                 $filename,
                 $this->templatesPath . 'migration.stub',
@@ -123,7 +124,6 @@ class SkeletonsGenerator extends Command
         }
 
     }
-
 
     protected function generateSeeder($model, $plural)
     {
@@ -138,7 +138,7 @@ class SkeletonsGenerator extends Command
 
     protected function generateViews($singular, $plural)
     {
-        $viewPath = resource_path("views" .DIRECTORY_SEPARATOR . $plural);
+        $viewPath = str_replace('/', DIRECTORY_SEPARATOR, resource_path("views/{$plural}"));
         File::makeDirectory($viewPath, 0777, true, true);
 
         foreach (['index', 'create', 'edit', 'show'] as $view) {
