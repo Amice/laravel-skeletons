@@ -13,6 +13,7 @@ return [
     'actions' => 'Actions',
     'delete' => 'Delete',
     'details_of' => 'Details of',
-    'list_of' => 'List of',
+    'list_of' => 'List of :models',
     'back' => 'Back',
+    'not_found' => ':file not found.',
 ];

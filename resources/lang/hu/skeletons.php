@@ -13,6 +13,7 @@ return [
     'actions' => 'Műveletek',
     'delete' => 'Töröl',
     'details_of' => 'Részletek',
-    'list_of' => 'listája',
+    'list_of' => ':Models listája',
     'back' => 'Vissza',
+    'not_found' => ':file nem található.',
 ];

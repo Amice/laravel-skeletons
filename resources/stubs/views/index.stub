@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="container">
-        <h1>{{ __('skeletons.list_of') }} {{plural}}</h1>
+        <h1>{{ __('skeletons.list_of', ['models' => '{{plural}}']) }}</h1>
         <a href="{{ route('{{plural}}.create') }}" class="btn btn-primary">{{ __('skeletons.create') }}</a>
         <table class="table mt-3">
             <thead>

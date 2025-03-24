@@ -57,11 +57,15 @@ class SkeletonsGenerator extends Command
         $this->generateViews($singular, $plural);
         $this->info("✅ All files generated successfully!");
 
-        $this->addRoutes($singular, $plural);
-        $this->info("✅ web.php has been updated successfully!");
+        $result = $this->addRoutes($singular, $plural);
+        if ($result) {
+            $this->info("✅ web.php has been updated successfully!");
+        }
 
         $this->copyLocalizationFiles();
         $this->info("✅ Language files have been created successfully!");
+
+        $this->output->writeln("❗ To create the database table(s) don't forget to run command: <fg=yellow>php artisan migrate</>");
     }
 
     protected function generateController($model, $singular, $plural)
@@ -151,11 +155,50 @@ class SkeletonsGenerator extends Command
             );
         }
 
-        $sourceFile = str_replace('/', DIRECTORY_SEPARATOR,  $this->templatesPath . "views/layout.example.stub");
-        $layoutsPath = resource_path("views" . DIRECTORY_SEPARATOR . "layouts");
+        $sourceFile = str_replace('/', DIRECTORY_SEPARATOR, $this->templatesPath . "views/layout.example.stub");
+        $layoutsPath = str_replace('/', DIRECTORY_SEPARATOR, resource_path("views/layouts"));
         $destinationFile = $layoutsPath . DIRECTORY_SEPARATOR . "example.app.blade.php";
         File::ensureDirectoryExists($layoutsPath);
         File::copy($sourceFile, $destinationFile);
+    }
+
+    private function addRoutes(string $singular, string $plural)
+    {
+        $webPhpPath = str_replace('/', DIRECTORY_SEPARATOR, base_path('routes/web.php'));
+        if (!File::exists($webPhpPath)) {
+            $errorMsg = __('skeletons.not_found', ['file' => $webPhpPath]);
+            $this->error($errorMsg);
+            Log::error("$webPhpPath not found.");
+            return false;
+        }
+        $routeDefinition = $this->getRouteDefinitions($singular, $plural);
+        // Read the file contents
+        $webPhpContent = File::get($webPhpPath);
+
+//        $controllerClass = "App\\Http\\Controllers\\" . ucfirst($singular) . "Controller";
+        $useStatement = $this->getUseStatement($singular);
+
+        // Check if the `use` statement already exists to avoid duplication
+
+        if (!str_contains($webPhpContent, $useStatement)) {
+            $webPhpContent = str_replace("<?php", "<?php\n$useStatement\n", $webPhpContent);
+        }
+
+        if (str_contains($webPhpContent, $routeDefinition)) {
+            $this->info("Route already exists in web.php: $routeDefinition");
+            Log::info("Route already exists: $routeDefinition");
+            return null;
+        }
+
+        $webPhpContent .= "\n" . $routeDefinition . "\n";
+        File::put($webPhpPath, $webPhpContent);
+
+        return true;
+    }
+
+    private function getUseStatement($singular)
+    {
+        return  "use  App\\Http\\Controllers\\" . ucfirst($singular) . "Controller;";
     }
 
     protected function copyLocalizationFiles()
@@ -293,41 +336,10 @@ class SkeletonsGenerator extends Command
             }
         }
     }
-    private function addRoutes(string $singular, string $plural)
-    {
-        $webPhpPath = base_path('routes' . DIRECTORY_SEPARATOR . 'web.php');
-        if (!File::exists($webPhpPath)) {
-            $this->error("web.php not found.");
-            Log::error("web.php not found.");
-            return;
-        }
-        $routeDefinition = $this->getRouteDefinitions($singular, $plural);
-        // Read the file contents
-        $webPhpContent = File::get($webPhpPath);
-
-        $controllerClass = "App\\Http\\Controllers\\" . ucfirst($singular) . "Controller";
-        $useStatement = "use $controllerClass;";
-
-        // Check if the `use` statement already exists to avoid duplication
-        if (!str_contains($webPhpContent, $useStatement)) {
-            $webPhpContent = str_replace("<?php\n", "<?php\n\n$useStatement\n", $webPhpContent);
-        }
-
-        if (str_contains($webPhpContent, $routeDefinition)) {
-            $this->info("Route already exists in web.php: $routeDefinition");
-            Log::info("Route already exists: $routeDefinition");
-            return;
-        }
-
-        $webPhpContent .= "\n" . $routeDefinition . "\n";
-        File::put($webPhpPath, $webPhpContent);
-        $this->info("Added route to web.php: $routeDefinition");
-        Log::info("Added new route: $routeDefinition");
-    }
 
     private function removeRoutes(string $singular)
     {
-        $webPhpPath = base_path('routes' . DIRECTORY_SEPARATOR . 'web.php');
+        $webPhpPath = str_replace('/', DIRECTORY_SEPARATOR, base_path('routes/web.php'));
         if (!File::exists($webPhpPath)) {
             $msg = "$webPhpPath not found.";
             $this->info($msg);
@@ -336,12 +348,11 @@ class SkeletonsGenerator extends Command
         }
 
         $ucSingular = ucfirst($singular);
-        $controllerClass = "{$ucSingular}Controller::class";
+        $controllerClass = "{$ucSingular}Controller";
 
         // Open the file and read line by line
         $lines = File::lines($webPhpPath);
         $filteredLines = [];
-
         foreach ($lines as $line) {
             // Add the line only if it doesn't contain the search string
             if (strpos($line, $controllerClass) === false) {
