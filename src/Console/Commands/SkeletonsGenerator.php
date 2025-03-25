@@ -396,12 +396,14 @@ class SkeletonsGenerator extends Command
             $routeDefinition .= "    Route::put('$plural/{singular}', [{$controllerClass}, 'update'])->name('$plural.update');\n";
             $routeDefinition .= "    Route::delete('$plural/{singular}', [{$controllerClass}, 'destroy'])->name('$plural.destroy');\n";
             $routeDefinition .= "});\n";
+            $routeDefinition .= "Route::post('/$plural/search', [$controllerClass, 'search'])->name('$plural.search');\n";
             $routeDefinition .= "Route::resource('$plural', {$controllerClass})->except(['create', 'store', 'edit', 'update', 'destroy']);\n";
-            $routeDefinition .= "Route::post('/$plural/search', [$controllerClass, 'search'])->name('$plural.search')\n";
 
             return $routeDefinition;
         }
+        $routeDefinition = "Route::post('/$plural/search', [$controllerClass, 'search'])->name('$plural.search');\n";
+        $routeDefinition .= "Route::resource('$plural', {$controllerClass});";
 
-        return "Route::resource('$plural', {$controllerClass});";
+        return $routeDefinition;
     }
 }
