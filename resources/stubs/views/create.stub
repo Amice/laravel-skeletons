@@ -3,6 +3,7 @@
 @section('content')
     <div class="container">
         <h1>{{ __('skeletons.create') }} {{singular}}</h1>
+        @include('layouts.error')
         <form action="{{ route('{{plural}}.store') }}" method="POST">
             @csrf
             <div class="form-group">

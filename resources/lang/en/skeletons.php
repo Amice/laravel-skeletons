@@ -15,5 +15,7 @@ return [
     'details_of' => 'Details of',
     'list_of' => 'List of :models',
     'back' => 'Back',
-    'not_found' => ':file not found.',
+    'not_found' => 'Not found.',
+    'file_not_found' => ':file not found.',
+    'search' => 'Search',
 ];

@@ -154,19 +154,35 @@ class SkeletonsGenerator extends Command
                 ['{{singular}}' => $singular, '{{plural}}' => $plural]
             );
         }
+        $this->generateLayoutsViews($singular, $plural);
 
-        $sourceFile = str_replace('/', DIRECTORY_SEPARATOR, $this->templatesPath . "views/layout.example.stub");
+
+    }
+
+    private function generateLayoutsViews($singular, $plural)
+    {
         $layoutsPath = str_replace('/', DIRECTORY_SEPARATOR, resource_path("views/layouts"));
-        $destinationFile = $layoutsPath . DIRECTORY_SEPARATOR . "example.app.blade.php";
         File::ensureDirectoryExists($layoutsPath);
-        File::copy($sourceFile, $destinationFile);
+        $sourceFies = [
+            'app.example.stub',
+            'error.stub',
+            'search.stub',
+            'success.stub',
+        ];
+        foreach ($sourceFies as $file) {
+            $sourceFile = str_replace('/', DIRECTORY_SEPARATOR, $this->templatesPath . "views/layouts/$file");
+            $destinationFile = $layoutsPath . DIRECTORY_SEPARATOR . str_replace("stub", "blade.php", $file);
+            if (! File::exists($destinationFile)) {
+                File::copy($sourceFile, $destinationFile);
+            }
+        }
     }
 
     private function addRoutes(string $singular, string $plural)
     {
         $webPhpPath = str_replace('/', DIRECTORY_SEPARATOR, base_path('routes/web.php'));
         if (!File::exists($webPhpPath)) {
-            $errorMsg = __('skeletons.not_found', ['file' => $webPhpPath]);
+            $errorMsg = __('skeletons.file_not_found', ['file' => $webPhpPath]);
             $this->error($errorMsg);
             Log::error("$webPhpPath not found.");
             return false;
@@ -381,6 +397,7 @@ class SkeletonsGenerator extends Command
             $routeDefinition .= "    Route::delete('$plural/{singular}', [{$controllerClass}, 'destroy'])->name('$plural.destroy');\n";
             $routeDefinition .= "});\n";
             $routeDefinition .= "Route::resource('$plural', {$controllerClass})->except(['create', 'store', 'edit', 'update', 'destroy']);\n";
+            $routeDefinition .= "Route::post('/$plural/search', [$controllerClass, 'search'])->name('$plural.search')\n";
 
             return $routeDefinition;
         }

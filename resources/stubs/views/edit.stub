@@ -3,6 +3,7 @@
 @section('content')
     <div class="container">
         <h1>{{ __('skeletons.edit') }} {{singular}}</h1>
+        @include('layouts.error')
         <form action="{{ route('{{plural}}.update', ${{singular}}) }}" method="POST">
             @csrf
             @method('PUT')

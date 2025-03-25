@@ -15,5 +15,7 @@ return [
     'details_of' => 'Részletek',
     'list_of' => ':Models listája',
     'back' => 'Vissza',
-    'not_found' => ':file nem található.',
+    'not_found' => 'Nem található!',
+    'file_not_found' => ':file nem található.',
+    'search' => 'Keres',
 ];

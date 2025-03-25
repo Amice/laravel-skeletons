@@ -3,7 +3,9 @@
 @section('content')
     <div class="container">
         <h1>{{ __('skeletons.list_of', ['models' => '{{plural}}']) }}</h1>
+        @include('layouts.success')
         <a href="{{ route('{{plural}}.create') }}" class="btn btn-primary">{{ __('skeletons.create') }}</a>
+        @include('layouts.search', ['route' => '{{plural}}.search'])
         <table class="table mt-3">
             <thead>
                 <tr>

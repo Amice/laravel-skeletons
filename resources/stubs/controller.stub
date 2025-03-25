@@ -60,4 +60,18 @@ class {{model}}Controller extends Controller
 
         return redirect()->route('{{plural}}.index')->with('success', __('skeletons.deleted_successfully', ['model' => '{{model}}']));
     }
+
+    public function search(Request $request)
+    {
+        $needle = $request->get('needle');
+        ${{plural}} = {{model}}::select('*')
+            ->where('name', 'like', "%{$needle}%")
+            ->orderBy('name')
+            ->get();
+        if (empty(${{plural}})) {
+            ${{plural}} = [];
+        }
+
+        return view('{{plural}}.index', compact('{{plural}}'));
+    }
 }
