@@ -7,11 +7,11 @@
         <form action="{{ route('{{plural}}.update', ${{singular}}) }}" method="POST">
             @csrf
             @method('PUT')
-            <div class="form-group">
+            <div>
                 <label for="name">{{ __('skeletons.name') }}</label>
-                <input type="text" name="name" id="name" class="form-control" value="{{ ${{singular}}->name }}" required>
+                <input type="text" name="name" id="name" value="{{ ${{singular}}->name }}" required>
             </div>
-            <button type="submit" class="btn btn-save mt-3">{{ __('skeletons.save') }}</button>
+            <button type="submit">{{ __('skeletons.save') }}</button>
             <a href="{{ route('{{plural}}.index') }}">{{ __('skeletons.cancel') }}</a>
         </form>
     </div>

@@ -4,9 +4,9 @@
     <div class="container">
         <h1>{{ __('skeletons.list_of', ['models' => '{{plural}}']) }}</h1>
         @include('layouts.success')
-        <a href="{{ route('{{plural}}.create') }}" class="btn btn-primary">{{ __('skeletons.create') }}</a>
+        <a href="{{ route('{{plural}}.create') }}">{{ __('skeletons.create') }}</a>
         @include('layouts.search', ['route' => '{{plural}}.search'])
-        <table class="table mt-3">
+        <table>
             <thead>
                 <tr>
                     <th>ID</th>
@@ -20,11 +20,11 @@
                         <td>{{ ${{singular}}->id }}</td>
                         <td>{{ ${{singular}}->name }}</td>
                         <td>
-                            <a href="{{ route('{{plural}}.edit', ${{singular}}) }}" class="btn btn-warning">{{ __('skeletons.edit') }}</a>
+                            <a href="{{ route('{{plural}}.edit', ${{singular}}) }}">{{ __('skeletons.edit') }}</a>
                             <form action="{{ route('{{plural}}.destroy', ${{singular}}) }}" method="POST" style="display:inline;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger">{{ __('skeletons.delete') }}</button>
+                                <button type="submit">{{ __('skeletons.delete') }}</button>
                             </form>
                         </td>
                     </tr>
