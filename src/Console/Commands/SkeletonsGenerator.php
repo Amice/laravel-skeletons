@@ -155,8 +155,6 @@ class SkeletonsGenerator extends Command
             );
         }
         $this->generateLayoutsViews($singular, $plural);
-
-
     }
 
     private function generateLayoutsViews($singular, $plural)
@@ -214,7 +212,7 @@ class SkeletonsGenerator extends Command
 
     private function getUseStatement($singular)
     {
-        return  "use  App\\Http\\Controllers\\" . ucfirst($singular) . "Controller;";
+        return  "use App\\Http\\Controllers\\" . Str::studly($singular) . "Controller;";
     }
 
     protected function copyLocalizationFiles()
@@ -385,8 +383,8 @@ class SkeletonsGenerator extends Command
 
     private function getRouteDefinitions(string $singular, string $plural)
     {
-        $ucSingular = ucfirst($singular);
-        $controllerClass = "{$ucSingular}Controller::class";
+        $model = Str::studly($singular);
+        $controllerClass = "{$model}Controller::class";
 
         if ($this->option('with-auth')) {
             $routeDefinition = "Route::middleware('auth')->group(function () {\n";
