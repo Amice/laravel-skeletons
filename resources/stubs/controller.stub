@@ -64,7 +64,7 @@ class {{model}}Controller extends Controller
     public function search(Request $request)
     {
         $needle = $request->get('needle');
-        ${{plural}} = {{model}}::->orderBy('name')->where('name', 'like', "%{$needle}%")->get();
+        ${{plural}} = {{model}}::orderBy('name')->where('name', 'like', "%{$needle}%")->get();
         if (empty(${{plural}})) {
             ${{plural}} = [];
         }
