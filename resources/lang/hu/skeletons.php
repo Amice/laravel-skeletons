@@ -18,4 +18,5 @@ return [
     'not_found' => 'Nem található!',
     'file_not_found' => ':file nem található.',
     'search' => 'Keres',
+    'show' => 'Mutat',
 ];

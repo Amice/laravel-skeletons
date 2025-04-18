@@ -18,4 +18,5 @@ return [
     'not_found' => 'Not found.',
     'file_not_found' => ':file not found.',
     'search' => 'Search',
+    'show' => 'Show',
 ];
