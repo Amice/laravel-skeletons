@@ -12,6 +12,7 @@ class SkeletonsGenerator extends Command
     const BASE_PATH = 'vendor/kovacs-laci/laravel-skeletons/';
     protected $signature = 'app:make-skeletons {singular} {plural}
                            {--with-auth : Routes will be generated with middleware}
+                           {--resource : Routes will be generated as resource}
                            {--force : Overwrite all existing files}
                            {--with-backup : Backup files before overwriting}
                            {--drop : Delete all generated files}
@@ -399,8 +400,22 @@ class SkeletonsGenerator extends Command
 
             return $routeDefinition;
         }
-        $routeDefinition = "Route::post('/$plural/search', [$controllerClass, 'search'])->name('$plural.search');\n";
-        $routeDefinition .= "Route::resource('$plural', {$controllerClass});";
+
+        if ($this->option('resource')) {
+            $routeDefinition = "Route::post('/$plural/search', [$controllerClass, 'search'])->name('$plural.search');\n";
+            $routeDefinition .= "Route::resource('$plural', {$controllerClass});";
+
+            return $routeDefinition;
+        }
+
+        $routeDefinition = "Route::post('/$plural', [$controllerClass::class, 'store'])->name('$plural.store');\n";
+        $routeDefinition .= "Route::get('/$plural/create', [$controllerClass::class, 'create'])->name('$plural.create');\n";
+        $routeDefinition .= "Route::patch('/$plural/{singular}', [$controllerClass::class, 'update'])->name('$plural.update');\n";
+        $routeDefinition .= "Route::get('/$plural/{singular}/edit', [$controllerClass::class, 'edit'])->name('$plural.edit');\n";
+        $routeDefinition .= "Route::delete('/$plural/{singular}', [$controllerClass::class, 'destroy'])->name('$plural.destroy');\n";
+        $routeDefinition .= "Route::get('/$plural', [$controllerClass::class, 'index'])->name('$plural.index');\n";
+        $routeDefinition .= "Route::get('/$plural/{singular}', [$controllerClass::class, 'show'])->name('$plural.show');\n";
+        $routeDefinition .= "Route::post('/$plural/search', [$controllerClass, 'search'])->name('$plural.search');\n";
 
         return $routeDefinition;
     }
