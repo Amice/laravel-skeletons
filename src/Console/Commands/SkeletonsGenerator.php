@@ -410,11 +410,11 @@ class SkeletonsGenerator extends Command
 
         $routeDefinition = "Route::post('/$plural', [$controllerClass, 'store'])->name('$plural.store');\n";
         $routeDefinition .= "Route::get('/$plural/create', [$controllerClass, 'create'])->name('$plural.create');\n";
-        $routeDefinition .= "Route::patch('/$plural/{$singular}', [$controllerClass, 'update'])->name('$plural.update');\n";
-        $routeDefinition .= "Route::get('/$plural/{$singular}/edit', [$controllerClass, 'edit'])->name('$plural.edit');\n";
-        $routeDefinition .= "Route::delete('/$plural/{$singular}', [$controllerClass, 'destroy'])->name('$plural.destroy');\n";
+        $routeDefinition .= "Route::put('/$plural/{{$singular}}', [$controllerClass, 'update'])->name('$plural.update');\n";
+        $routeDefinition .= "Route::get('/$plural/{{$singular}}/edit', [$controllerClass, 'edit'])->name('$plural.edit');\n";
+        $routeDefinition .= "Route::delete('/$plural/{{$singular}}', [$controllerClass, 'destroy'])->name('$plural.destroy');\n";
         $routeDefinition .= "Route::get('/$plural', [$controllerClass, 'index'])->name('$plural.index');\n";
-        $routeDefinition .= "Route::get('/$plural/{$singular}', [$controllerClass, 'show'])->name('$plural.show');\n";
+        $routeDefinition .= "Route::get('/$plural/{{$singular}}', [$controllerClass, 'show'])->name('$plural.show');\n";
         $routeDefinition .= "Route::post('/$plural/search', [$controllerClass, 'search'])->name('$plural.search');\n";
 
         return $routeDefinition;

@@ -22,9 +22,9 @@
                         <td>
                             <a href="{{ route('{{plural}}.show', ${{singular}}->id) }}">{{ __('skeletons.show')}}</a>
                             {{-- uncomment @if / @endif when authentication is required --}}
-                            {{-- @if(auth()->check()) -- }}
-                                <a href="{{ route('{{plural}}.edit', ${{singular}}) }}">{{ __('skeletons.edit') }}</a>
-                                <form action="{{ route('{{plural}}.destroy', ${{singular}}) }}" method="POST" style="display:inline;">
+                            {{-- @if(auth()->check()) --}}
+                                <a href="{{ route('{{plural}}.edit', ${{singular}}->id) }}">{{ __('skeletons.edit') }}</a>
+                                <form action="{{ route('{{plural}}.destroy', ${{singular}}->id) }}" method="POST" style="display:inline;">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit">{{ __('skeletons.delete') }}</button>
