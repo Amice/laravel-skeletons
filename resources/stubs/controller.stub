@@ -10,7 +10,8 @@ class {{model}}Controller extends Controller
 {
     public function index()
     {
-        ${{plural}} = {{model}}::all();
+        // ${{plural}} = {{model}}::all();
+        ${{plural}} = {{model}}::paginate(config('app.pagination_limit', 20));
 
         return view('{{plural}}.index', compact('{{plural}}'));
     }
@@ -64,7 +65,7 @@ class {{model}}Controller extends Controller
     public function search(Request $request)
     {
         $needle = $request->get('needle');
-        ${{plural}} = {{model}}::orderBy('name')->where('name', 'like', "%{$needle}%")->get();
+        ${{plural}} = {{model}}::orderBy('name')->where('name', 'like', "%{$needle}%")->paginate(config('app.pagination_limit', 20));
         if (empty(${{plural}})) {
             ${{plural}} = [];
         }

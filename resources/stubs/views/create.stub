@@ -7,8 +7,7 @@
         <form action="{{ route('{{plural}}.store') }}" method="POST">
             @csrf
             <div>
-                <label for="name">{{ __('skeletons.name') }}</label>
-                <input type="text" name="name" id="name" required>
+                <!-- form-input-fields -->
             </div>
             <button type="submit">{{ __('skeletons.save') }}</button>
             <a href="{{ route('{{plural}}.index') }}">{{ __('skeletons.cancel') }}</a>

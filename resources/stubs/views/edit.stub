@@ -8,8 +8,7 @@
             @csrf
             @method('PUT')
             <div>
-                <label for="name">{{ __('skeletons.name') }}</label>
-                <input type="text" name="name" id="name" value="{{ ${{singular}}->name }}" required>
+                <!-- form-input-fields -->
             </div>
             <button type="submit">{{ __('skeletons.save') }}</button>
             <a href="{{ route('{{plural}}.index') }}">{{ __('skeletons.cancel') }}</a>

@@ -3,20 +3,27 @@
 namespace KovacsLaci\LaravelSkeletons\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use KovacsLaci\LaravelSkeletons\Services\CreateViewUpdater;
+use KovacsLaci\LaravelSkeletons\Services\EditViewUpdater;
+use KovacsLaci\LaravelSkeletons\Services\IndexViewUpdater;
+use KovacsLaci\LaravelSkeletons\Services\ShowViewUpdater;
+use KovacsLaci\LaravelSkeletons\Services\AbstractViewUpdater;
 
 class SkeletonsGenerator extends Command
 {
     const BASE_PATH = 'vendor/kovacs-laci/laravel-skeletons/';
     protected $signature = 'app:make-skeletons {singular} {plural}
-                           {--with-auth : Routes will be generated with middleware}
                            {--resource : Routes will be generated as resource}
                            {--force : Overwrite all existing files}
+                           {--with-auth : Routes will be generated with middleware}
                            {--with-backup : Backup files before overwriting}
                            {--drop : Delete all generated files}
-                           {--purge : Delete all generated files including .bak files}';
+                           {--purge : Delete all generated files including .bak files}
+                           {--update-views : Update views based on model. Migration must be run first!}';
 
     protected $description = 'Generate or remove Controller, Model, Request, Migration, Seeder, Views, and Routes for a given model.';
 
@@ -44,6 +51,14 @@ class SkeletonsGenerator extends Command
 
         if ($this->option('drop')) {
             $this->dropFiles($model, $singular, $plural);
+            return;
+        }
+
+        if ($this->option('update-views')) {
+//            $this->updateViews($model, $singular, $plural);
+            $this->updateViews($model);
+//            $viewUpdater = new ViewUpdater($model, $this);
+//            $viewUpdater->updateViews(); // Updates index, create, edit, show in one call!
             return;
         }
 
@@ -419,4 +434,20 @@ class SkeletonsGenerator extends Command
 
         return $routeDefinition;
     }
+
+    private function updateViews(string $model)
+    {
+        $indexView = new IndexViewUpdater($model, $this);
+        $indexView->updateViewContent();
+
+        $createView = new CreateViewUpdater($model, $this);
+        $createView->updateViewContent();
+
+        $editView = new EditViewUpdater($model, $this);
+        $editView->updateViewContent();
+
+        $showView = new ShowViewUpdater($model, $this);
+        $showView->updateViewContent();
+    }
+
 }

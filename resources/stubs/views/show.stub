@@ -3,6 +3,7 @@
 @section('content')
     <div class="container">
         <h1>{{ __('skeletons.details_of') }} {{singular}}</h1>
+        <!-- display-data -->
         <p><strong>{{ __('skeletons.name') }}:</strong> {{ ${{singular}}->name }}</p>
         <a href="{{ route('{{plural}}.index') }}">{{ __('skeletons.back') }}</a>
     </div>

@@ -8,32 +8,17 @@
         @include('layouts.search', ['route' => '{{plural}}.search'])
         <table>
             <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>{{ __('skeletons.name') }}</th>
-                    <th>{{ __('skeletons.actions') }}</th>
-                </tr>
+                <!-- table-head -->
             </thead>
             <tbody>
                 @foreach (${{plural}} as ${{singular}})
-                    <tr>
-                        <td>{{ ${{singular}}->id }}</td>
-                        <td>{{ ${{singular}}->name }}</td>
-                        <td>
-                            <a href="{{ route('{{plural}}.show', ${{singular}}->id) }}">{{ __('skeletons.show')}}</a>
-                            {{-- uncomment @if / @endif when authentication is required --}}
-                            {{-- @if(auth()->check()) --}}
-                                <a href="{{ route('{{plural}}.edit', ${{singular}}->id) }}">{{ __('skeletons.edit') }}</a>
-                                <form action="{{ route('{{plural}}.destroy', ${{singular}}->id) }}" method="POST" style="display:inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit">{{ __('skeletons.delete') }}</button>
-                                </form>
-                            {{-- @endif --}}
-                        </td>
-                    </tr>
+                    <!-- table-columns -->
                 @endforeach
             </tbody>
         </table>
+        <!-- Pagination Links -->
+        <div class="pagination">
+            {{ ${{plural}}->links() }}
+        </div>
     </div>
 @endsection
