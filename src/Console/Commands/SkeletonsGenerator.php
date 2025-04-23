@@ -3,7 +3,6 @@
 namespace KovacsLaci\LaravelSkeletons\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -11,7 +10,6 @@ use KovacsLaci\LaravelSkeletons\Services\CreateViewUpdater;
 use KovacsLaci\LaravelSkeletons\Services\EditViewUpdater;
 use KovacsLaci\LaravelSkeletons\Services\IndexViewUpdater;
 use KovacsLaci\LaravelSkeletons\Services\ShowViewUpdater;
-use KovacsLaci\LaravelSkeletons\Services\AbstractViewUpdater;
 
 class SkeletonsGenerator extends Command
 {
