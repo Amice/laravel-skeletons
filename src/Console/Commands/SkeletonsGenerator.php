@@ -3,6 +3,7 @@
 namespace KovacsLaci\LaravelSkeletons\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -10,6 +11,8 @@ use KovacsLaci\LaravelSkeletons\Services\CreateViewUpdater;
 use KovacsLaci\LaravelSkeletons\Services\EditViewUpdater;
 use KovacsLaci\LaravelSkeletons\Services\IndexViewUpdater;
 use KovacsLaci\LaravelSkeletons\Services\ShowViewUpdater;
+use KovacsLaci\LaravelSkeletons\Services\AbstractViewUpdater;
+use KovacsLaci\LaravelSkeletons\Services\TranslationManager;
 
 class SkeletonsGenerator extends Command
 {
@@ -28,6 +31,7 @@ class SkeletonsGenerator extends Command
     private $templatesPath;
 
     private $basePath;
+
 
     function __construct($basePath = self::BASE_PATH, $templatesPath = 'resources/stubs/')
     {
@@ -53,10 +57,9 @@ class SkeletonsGenerator extends Command
         }
 
         if ($this->option('update-views')) {
-//            $this->updateViews($model, $singular, $plural);
+            $translationManager = new TranslationManager($model, $this);
+            $translationManager->generateTranslationFiles();
             $this->updateViews($model);
-//            $viewUpdater = new ViewUpdater($model, $this);
-//            $viewUpdater->updateViews(); // Updates index, create, edit, show in one call!
             return;
         }
 
@@ -76,8 +79,9 @@ class SkeletonsGenerator extends Command
             $this->info("✅ web.php has been updated successfully!");
         }
 
-        $this->copyLocalizationFiles();
-        $this->info("✅ Language files have been created successfully!");
+        $translationManager = new TranslationManager($model, $this);
+        $translationManager->generateTranslationFiles();
+        $translationManager->copyLocalizationFiles($this->basePath);
 
         $this->output->writeln("❗ To create the database table(s) don't forget to run command: <fg=yellow>php artisan migrate</>");
     }
@@ -229,31 +233,31 @@ class SkeletonsGenerator extends Command
         return  "use App\\Http\\Controllers\\" . Str::studly($singular) . "Controller;";
     }
 
-    protected function copyLocalizationFiles()
-    {
-        $sourcePath = $this->basePath . 'resources' . DIRECTORY_SEPARATOR . 'lang';
-        $destinationPath = resource_path('lang');
-
-        // Ensure the source directory exists
-        if (File::isDirectory($sourcePath)) {
-            // Get all files and subdirectories from the source
-            $items = File::allFiles($sourcePath);
-
-            foreach ($items as $file) {
-                $relativePath = $file->getRelativePathname(); // Get the relative path of the file
-                $destinationFile = $destinationPath . DIRECTORY_SEPARATOR . $relativePath;
-
-                // Check if the file already exists in the destination
-                if (!File::exists($destinationFile)) {
-                    // Ensure the destination subdirectory exists
-                    File::ensureDirectoryExists(dirname($destinationFile));
-
-                    // Copy the file
-                    File::copy($file->getPathname(), $destinationFile);
-                }
-            }
-        }
-    }
+//    protected function copyLocalizationFiles()
+//    {
+//        $sourcePath = $this->basePath . 'resources' . DIRECTORY_SEPARATOR . 'lang';
+//        $destinationPath = resource_path('lang');
+//
+//        // Ensure the source directory exists
+//        if (File::isDirectory($sourcePath)) {
+//            // Get all files and subdirectories from the source
+//            $items = File::allFiles($sourcePath);
+//
+//            foreach ($items as $file) {
+//                $relativePath = $file->getRelativePathname(); // Get the relative path of the file
+//                $destinationFile = $destinationPath . DIRECTORY_SEPARATOR . $relativePath;
+//
+//                // Check if the file already exists in the destination
+//                if (!File::exists($destinationFile)) {
+//                    // Ensure the destination subdirectory exists
+//                    File::ensureDirectoryExists(dirname($destinationFile));
+//
+//                    // Copy the file
+//                    File::copy($file->getPathname(), $destinationFile);
+//                }
+//            }
+//        }
+//    }
 
     protected function createFile($filePath, $stubPath, $replacements)
     {
@@ -285,6 +289,11 @@ class SkeletonsGenerator extends Command
 
     protected function dropFiles($model, $singular, $plural, $purge = false)
     {
+        self::deleteMigrations($plural, $purge);
+        self::deleteViews($plural, $purge);
+        self::deleteLanguages($model, $purge);
+        self::removeRoutes($singular);
+
         $files = [
             app_path("Http/Controllers/{$model}Controller.php"),
             app_path("Models/{$model}.php"),
@@ -307,10 +316,6 @@ class SkeletonsGenerator extends Command
             }
         }
 
-        self::deleteMigrations($plural, $purge);
-        self::deleteViews($plural, $purge);
-        self::deleteLanguages($purge);
-        self::removeRoutes($singular);
     }
 
     private function deleteMigrations($plural, $purge)
@@ -347,22 +352,9 @@ class SkeletonsGenerator extends Command
         }
     }
 
-    private function deleteLanguages($purge, $languages = ['en', 'hu'])
+    private function deleteLanguages($model, $purge)
     {
-        foreach ($languages as $language) {
-            $langSkeletonsPath = resource_path("lang" . DIRECTORY_SEPARATOR . $language . DIRECTORY_SEPARATOR . "skeletons.php");
-            if (File::exists($langSkeletonsPath)) {
-                File::delete($langSkeletonsPath);
-                $this->info("❌ Deleted language file: $langSkeletonsPath");
-                if ($purge) {
-                    $bakFile = $langSkeletonsPath . '.bak';
-                    if (File::exists($bakFile)) {
-                        File::delete($bakFile);
-                        $this->info("❌ Deleted: {$bakFile}");
-                    }
-                }
-            }
-        }
+        TranslationManager::deleteLanguageFiles($model, $this, $purge);
     }
 
     private function removeRoutes(string $singular)

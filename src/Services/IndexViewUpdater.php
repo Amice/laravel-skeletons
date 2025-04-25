@@ -35,7 +35,7 @@ class IndexViewUpdater extends AbstractViewUpdater
         $tableColumns = "\n<tr>";
         foreach ($this->columns as $column) {
             $fieldName = $column->Field;
-            $tHead .= "\n<th>{{ __('messages.$fieldName') }}</th>";
+            $tHead .= "\n<th>{{ __('$singular.$fieldName') }}</th>";
             $tableColumns .= "\n<td>{{ $$singular->$fieldName}}</td>";
         }
         $tHead .= "\n<th>{{ __('skeletons.actions') }}</th>\n</tr>";
@@ -65,15 +65,4 @@ class IndexViewUpdater extends AbstractViewUpdater
         </td>
         BLADE;
     }
-
-//    private function generateTableFields(string $singular): string
-//    {
-//        return implode("\n", array_map(fn($field) => "<td>{{ \${$singular}->$field }}</td>", $this->fillableFields));
-//    }
-//
-//    private function generateTableHead(): string
-//    {
-//        return implode("\n", array_map(fn($field) => "<th>{{ __('messages.$field') }}</th>", $this->fillableFields));
-//    }
-
 }

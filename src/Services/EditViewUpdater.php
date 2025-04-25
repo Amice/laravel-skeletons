@@ -46,7 +46,7 @@ class EditViewUpdater extends AbstractViewUpdater
                 $options = $this->extractEnumOptions($column->Type);
 
                 $fields .= <<<BLADE
-                <label for="$fieldName">{{ __('messages.$fieldName') }}</label>
+                <label for="$fieldName">{{ __('$singular.$fieldName') }}</label>
                 <select name="$fieldName" id="$fieldName" $required>
                     @foreach($options as \$option)
                         <option value="{{ \$option }}" {{ \$option == $oldValue ? 'selected' : '' }}>{{ \$option }}</option>
@@ -59,14 +59,14 @@ class EditViewUpdater extends AbstractViewUpdater
                 $value = $checked ? 1 : 0;
 
                 $fields .= <<<BLADE
-                <label for="$fieldName">{{ __('messages.$fieldName') }}</label>
+                <label for="$fieldName">{{ __('$singular.$fieldName') }}</label>
                 <input type="checkbox" name="$fieldName" id="$fieldName" value="$value" $checked>
             BLADE;
             } // Handle standard input fields
             else {
                 $fields .= <<<BLADE
-                <label for="$fieldName">{{ __('messages.$fieldName') }}</label>
-                <input type="$inputType" name="$fieldName" id="$fieldName" $required placeholder="{{ __('messages.$fieldName') }}" value="$oldValue">
+                <label for="$fieldName">{{ __('$singular.$fieldName') }}</label>
+                <input type="$inputType" name="$fieldName" id="$fieldName" $required placeholder="{{ __('$singular.$fieldName') }}" value="$oldValue">
             BLADE;
             }
 

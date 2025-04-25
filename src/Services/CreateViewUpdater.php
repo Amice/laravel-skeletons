@@ -31,6 +31,7 @@ class CreateViewUpdater extends AbstractViewUpdater
      */
     protected function generateViewContent(): string
     {
+        $singular = Str::lower($this->model);
         $fields = "\n";
 
         foreach ($this->columns as $column) {
@@ -48,7 +49,7 @@ class CreateViewUpdater extends AbstractViewUpdater
 
                 $fields .=
                     <<<BLADE
-                        <label for="$fieldName">{{ __('messages.$fieldName') }}</label>
+                        <label for="$fieldName">{{ __('$singular.$fieldName') }}</label>
                         <select name="$fieldName" id="$fieldName" $required>
                             @foreach($options as \$option)
                                 <option value="{{ \$option }}" {{ \$option == $oldValue ? 'selected' : '' }}>{{ \$option }}</option>
@@ -60,14 +61,14 @@ class CreateViewUpdater extends AbstractViewUpdater
 
                 $fields .=
                     <<<BLADE
-                        <label for="$fieldName">{{ __('messages.$fieldName') }}</label>
+                        <label for="$fieldName">{{ __('$singular.$fieldName') }}</label>
                         <input type="checkbox" name="$fieldName" id="$fieldName" value="1" $checked>
                     BLADE;
             } else {
                 $fields .=
                     <<<BLADE
-                        <label for="$fieldName">{{ __('messages.$fieldName') }}</label>
-                        <input type="$inputType" name="$fieldName" id="$fieldName" $required placeholder="{{ __('messages.$fieldName') }}" value="$oldValue">
+                        <label for="$fieldName">{{ __('$singular.$fieldName') }}</label>
+                        <input type="$inputType" name="$fieldName" id="$fieldName" $required placeholder="{{ __('{{singular}}.$fieldName') }}" value="$oldValue">
                     BLADE;
             }
             $fields .= "\n</fieldset>\n";

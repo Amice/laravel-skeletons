@@ -34,7 +34,7 @@ class ShowViewUpdater extends AbstractViewUpdater
 
             $fields .=
                 <<<BLADE
-                    <p><strong>{{ __('messages.$fieldName') }}:</strong> {{ \${$singular}->$fieldName }}</p>
+                    <p><strong>{{ __('$singular.$fieldName') }}:</strong> {{ \${$singular}->$fieldName }}</p>
                 BLADE;
         }
 
