@@ -1,0 +1,110 @@
+<?php
+
+namespace App\Services;
+
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
+
+abstract class AbstractGenerator
+{
+    protected $command;       // Command instance for feedback
+    protected $parsedData;
+    protected $tableName;     // Name of the table
+    protected $columns;       // Columns data from migration
+    protected $relationships; // Relationships data from migration
+    protected $modelName;     // Model name
+    protected $singular;
+    protected $plural;
+    protected $generatedFiles = []; // Track generated files
+    protected $backupFiles = [];    // Track backup files
+
+    public function __construct($command, array $parsedData)
+    {
+        $this->command = $command;
+        $this->parsedData = $parsedData;
+        $this->tableName = $parsedData['tableName'];
+        $this->columns = $parsedData['columns'];
+        $this->relationships = $parsedData['relationships'];
+        $this->modelName = $this->getModelName($this->tableName);
+        $this->singular = Str::camel($this->modelName);
+        $this->plural = Str::camel($this->tableName);
+    }
+
+    abstract public function generate(): ?array;
+    protected function replacePlaceholders(string $stub, array $placeholders): string
+    {
+        return Str::replace(array_keys($placeholders), array_values($placeholders), $stub);
+    }
+
+    public static function getModelName($tableName): string
+    {
+        return Str::studly(Str::singular($tableName));
+    }
+
+    public static function getPath($path): string
+    {
+        return Str::replace('/', DIRECTORY_SEPARATOR, $path);
+    }
+
+    public static function getStubContent(string $stub): string
+    {
+        $stubPath = self::getPath(resource_path("stubs/{$stub}"));
+        if (!File::exists($stubPath)) {
+            throw new \Exception("Stub file not found: {$stubPath}");
+        }
+
+        return File::get($stubPath);
+    }
+    protected function createBackup(string $filePath): void
+    {
+        if (File::exists($filePath)) {
+            $baseBackupPath = $filePath . '.bak';
+            $backupPath = $baseBackupPath;
+
+            // If the base backup already exists, attach a number
+            if (File::exists($baseBackupPath)) {
+                $counter = 1;
+                // Iterate until a backup file name that does not exist is found
+                while (File::exists($filePath . "({$counter}).bak")) {
+                    $counter++;
+                }
+                $backupPath = $filePath . "({$counter}).bak";
+            }
+
+            File::copy($filePath, $backupPath);
+            $this->backupFiles[$filePath] = $backupPath;
+            $this->command->info("Backup created: {$backupPath}");
+        }
+    }
+
+    public function rollback(): void
+    {
+        $this->command->warn("Rolling back changes...");
+        foreach ($this->generatedFiles as $file) {
+            if (File::exists($file)) {
+                File::delete($file);
+                $this->command->info("Deleted: {$file}");
+            }
+        }
+
+        foreach ($this->backupFiles as $original => $backup) {
+            if (File::exists($backup)) {
+                File::move($backup, $original);
+                $this->command->info("Restored: {$original} from backup");
+            }
+        }
+        $this->command->warn("Rollback complete.");
+    }
+
+    public static function purge($filePath): void
+    {
+        if (File::exists($filePath)) {
+            $backupPath = $filePath . '.bak';
+            if (File::exists($backupPath)) {
+                File::delete($backupPath);
+            }
+            File::delete($filePath);
+        }
+    }
+
+}

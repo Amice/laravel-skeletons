@@ -2,20 +2,46 @@
 
 @section('content')
     <div class="container">
+        <!-- Page Title -->
         <h1>{{ __('skeletons.list_of', ['models' => '{{plural}}']) }}</h1>
+
+        <!-- Success Message -->
         @include('layouts.success')
-        <a href="{{ route('{{plural}}.create') }}">{{ __('skeletons.create') }}</a>
-        @include('layouts.search', ['route' => '{{plural}}.search'])
-        <table>
+
+        <!-- Create Link -->
+        <a href="{{ route('{{table_name}}.create') }}" class="btn btn-success">{{ __('skeletons.create') }}</a>
+
+        <!-- Search Field -->
+        @include('layouts.search', ['route' => '{{table_name}}.search'])
+
+        <!-- Data Table -->
+        <table class="table">
             <thead>
-                <!-- table-head -->
+                <tr>
+                    <!-- Dynamic Table Headers -->
+                    {{table_headers}}
+                    <th>{{ __('skeletons.actions') }}</th>
+                </tr>
             </thead>
             <tbody>
                 @foreach (${{plural}} as ${{singular}})
-                    <!-- table-columns -->
+                    <tr>
+                        <!-- Dynamic Table Columns -->
+                        {{table_rows}}
+                        <!-- Action Buttons -->
+                        <td>
+                            <a href="{{ route('{{table_name}}.edit', ${{singular}}) }}" class="btn btn-primary">{{ __('skeletons.edit') }}</a>
+                            <form action="{{ route('{{table_name}}.destroy', ${{singular}}) }}" method="POST" style="display:inline-block;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger">{{ __('skeletons.delete') }}</button>
+                            </form>
+                        </td>
+                    </tr>
                 @endforeach
             </tbody>
         </table>
+
         <!-- Pagination Links -->
         <div class="pagination">
             {{ ${{plural}}->links() }}

@@ -1,0 +1,15 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\{{controller}};
+
+// Routes for {{model}}
+Route::get('/{{plural}}', [{{controller}}::class, 'index'])->name('{{plural}}.index');
+Route::post('/{{plural}}', [{{controller}}::class, 'store'])->name('{{plural}}.store');
+Route::get('/{{plural}}/create', [{{controller}}::class, 'create'])->name('{{plural}}.create');
+Route::post('/{{plural}}/search', [{{controller}}::class, 'search'])->name('{{plural}}.search');
+
+Route::get('/{{plural}}/{{{singular}}}', [{{controller}}::class, 'show'])->name('{{plural}}.show');
+Route::put('/{{plural}}/{{{singular}}}', [{{controller}}::class, 'update'])->name('{{plural}}.update');
+Route::get('/{{plural}}/{{{singular}}}/edit', [{{controller}}::class, 'edit'])->name('{{plural}}.edit');
+Route::delete('/{{plural}}/{{{singular}}}', [{{controller}}::class, 'destroy'])->name('{{plural}}.destroy');

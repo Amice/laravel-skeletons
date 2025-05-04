@@ -2,33 +2,46 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\{{model}};
-use App\Http\Requests\{{model}}Request;
+{{useStatements}}
 use Illuminate\Http\Request;
 
-class {{model}}Controller extends Controller
+class {{className}} extends Controller
 {
+    /**
+     * Display a listing of the resource with pagination.
+     */
     public function index()
     {
-        // ${{plural}} = {{model}}::all();
+        // Retrieve paginated results
         ${{plural}} = {{model}}::paginate(config('app.pagination_limit', 20));
 
         return view('{{plural}}.index', compact('{{plural}}'));
     }
 
+    /**
+     * Show the form for creating a new resource.
+     */
     public function create()
     {
-        return view('{{plural}}.create');
+        {{relatedData}}
+
+        return view('{{plural}}.create'{{relatedCompactCreate}});
     }
 
+    /**
+     * Store a newly created resource in storage using validated request data.
+     */
     public function store({{model}}Request $request)
     {
-        // ${{singular}}->create($request->validated());
-        {{model}}::create($request->all());
+        {{model}}::create($request->validated());
 
-        return redirect()->route('{{plural}}.index')->with('success', __('skeletons.created_successfully', ['model' => '{{model}}']));
+        return redirect()->route('{{plural}}.index')
+            ->with('success', __('skeletons.created_successfully', ['model' => '{{model}}']));
     }
 
+    /**
+     * Display the specified resource.
+     */
     public function show(string $id)
     {
         ${{singular}} = {{model}}::findOrFail($id);
@@ -36,39 +49,50 @@ class {{model}}Controller extends Controller
         return view('{{plural}}.show', compact('{{singular}}'));
     }
 
+    /**
+     * Show the form for editing the specified resource.
+     */
     public function edit(string $id)
     {
-        ${{singular}} = {{model}}::findOrFail($id);
-
-        return view('{{plural}}.edit', compact('{{singular}}'));
+        ${{singular}} = {{model}}::findOrFail($id);{{relatedData}}
+        return view('{{plural}}.edit', compact({{relatedCompactEdit}}));
     }
 
+    /**
+     * Update the specified resource in storage using validated request data.
+     */
     public function update({{model}}Request $request, string $id)
     {
         ${{singular}} = {{model}}::findOrFail($id);
-    //    ${{singular}}->update($request->validated());
-        ${{singular}}->update($request->all());
 
-        return redirect()->route('{{plural}}.index')->with('success', __('skeletons.updated_successfully', ['model' => '{{model}}']));
+        ${{singular}}->update($request->validated());
+
+        return redirect()->route('{{plural}}.index')
+            ->with('success', __('skeletons.updated_successfully', ['model' => '{{model}}']));
     }
 
+    /**
+     * Remove the specified resource from storage.
+     */
     public function destroy(string $id)
     {
-        ${{singular}}  = {{model}}::find($id);
+        ${{singular}} = {{model}}::find($id);
+
         if (${{singular}}) {
             ${{singular}}->delete();
         }
 
-        return redirect()->route('{{plural}}.index')->with('success', __('skeletons.deleted_successfully', ['model' => '{{model}}']));
+        return redirect()->route('{{plural}}.index')
+            ->with('success', __('skeletons.deleted_successfully', ['model' => '{{model}}']));
     }
 
+    /**
+     * Search for resources based on provided needle input.
+     */
     public function search(Request $request)
     {
         $needle = $request->get('needle');
         ${{plural}} = {{model}}::orderBy('name')->where('name', 'like', "%{$needle}%")->paginate(config('app.pagination_limit', 20));
-        if (empty(${{plural}})) {
-            ${{plural}} = [];
-        }
 
         return view('{{plural}}.index', compact('{{plural}}'));
     }

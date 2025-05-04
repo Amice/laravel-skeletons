@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@yield('title', config('app.name'))</title>
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <script src="{{ asset('js/app.js') }}" defer></script>
+</head>
+<body>
+    <div id="app">
+        <!-- Include Navigation -->
+        @include('layouts.nav')
+
+        <!-- Content -->
+        <main>
+            @yield('content')
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <p>&copy; {{ date('Y') }} {{ config('app.name') }}. {{ __('skeletons.all_rights_reserved') }}</p>
+        </footer>
+    </div>
+</body>
+</html>

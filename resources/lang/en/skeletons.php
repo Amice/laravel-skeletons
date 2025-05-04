@@ -1,5 +1,6 @@
 <?php
 return [
+    'home' => 'Home',
     'created_successfully' => ':Model created successfully.',
     'updated_successfully' => ':Model updated successfully.',
     'deleted_successfully' => ':Model deleted successfully.',
@@ -19,4 +20,5 @@ return [
     'file_not_found' => ':file not found.',
     'search' => 'Search',
     'show' => 'Show',
+    'select' => '-- Select --',
 ];

@@ -2,15 +2,23 @@
 
 @section('content')
     <div class="container">
-        <h1>{{ __('skeletons.create') }} {{singular}}</h1>
-        @include('layouts.error')
-        <form action="{{ route('{{plural}}.store') }}" method="POST">
+        <!-- Page Title -->
+        <h1>{{ __('skeletons.create') }} {{ __('{{table_name}}.{{singular}}') }}</h1>
+
+        <!-- Success Message -->
+        @include('layouts.success')
+
+        <!-- Error Message -->
+        @include('layouts.errors')
+
+        <!-- Form -->
+        <form action="{{ route('{{table_name}}.store') }}" method="POST">
             @csrf
-            <div>
-                <!-- form-input-fields -->
-            </div>
+            {{form_fields}}
+            <!-- Save Button -->
             <button type="submit">{{ __('skeletons.save') }}</button>
-            <a href="{{ route('{{plural}}.index') }}">{{ __('skeletons.cancel') }}</a>
+            <!-- Cancel Button -->
+            <a href="{{ route('{{table_name}}.index') }}">{{ __('skeletons.cancel') }}</a>
         </form>
     </div>
 @endsection

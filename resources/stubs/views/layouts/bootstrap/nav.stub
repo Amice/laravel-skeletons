@@ -1,0 +1,24 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <!-- Brand/Home Link -->
+        <a class="navbar-brand" href="{{ url('/') }}">{{ __('skeletons.home') }}</a>
+
+        <!-- Responsive Toggler Button -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Collapsible Content -->
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ms-auto">
+                <!-- Add dynamic links to models or pages here -->
+                <!-- Example:
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('model.index') }}">Models</a>
+                </li>
+                -->
+            </ul>
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,7 @@
+<div class="my-3">
+    <form method="post" action="{{ route($route) }}" accept-charset="UTF-8" class="d-flex">
+        @csrf
+        <input type="search" name="needle" placeholder="{{ __('skeletons.search') }}" class="form-control me-2">
+        <button type="submit" class="btn btn-primary">{{ __('skeletons.search') }}</button>
+    </form>
+</div>

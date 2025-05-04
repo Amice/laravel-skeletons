@@ -1,0 +1,32 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Page Title -->
+            <h1 class="mb-4">{{ __('skeletons.edit') }} {{ __('{{table_name}}.{{singular}}') }}</h1>
+
+            <!-- Error Message -->
+            @include('layouts.errors')
+
+            <!-- Edit Form -->
+            <form action="{{ route('{{table_name}}.update', ${{singular}}) }}" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="card mb-3">
+                    <div class="card-body">
+                        {{form_fields}}
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <!-- Save Button -->
+                    <button type="submit" class="btn btn-primary">{{ __('skeletons.save') }}</button>
+                    <!-- Cancel Button -->
+                    <a href="{{ route('{{table_name}}.index') }}" class="btn btn-secondary">{{ __('skeletons.cancel') }}</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endsection

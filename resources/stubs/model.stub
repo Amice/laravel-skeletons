@@ -5,11 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 
-class {{model}} extends EloquentModel
+class {{ className }} extends EloquentModel
 {
     use HasFactory;
 
-    protected $fillable = ['name'];
+    protected $table = '{{ tableName }}';
 
-    protected $table = '{{plural}}';
+    protected $fillable = [{{ fillable }}];
+
+    {{ primaryKey }}{{ keyType }}{{ relationships }}
 }
