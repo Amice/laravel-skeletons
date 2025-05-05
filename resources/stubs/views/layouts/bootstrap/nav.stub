@@ -13,11 +13,6 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ms-auto">
                 <!-- Add dynamic links to models or pages here -->
-                <!-- Example:
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('model.index') }}">Models</a>
-                </li>
-                -->
             </ul>
         </div>
     </div>

@@ -31,7 +31,7 @@ class CreateViewGenerator extends BaseViewGenerator
                 $field = <<<HTML
                     <fieldset>
                         <label for="{$column['name']}">
-                            {{ __('{{table_name}}.{$column['name']}') }}
+                            {{ __('{$this->tableName}.{$column['name']}') }}
                         </label>
                         <select name="{$column['name']}" id="{$column['name']}" $required>
                             <option value="">{{ __('skeletons.select') }}</option>
@@ -45,14 +45,14 @@ class CreateViewGenerator extends BaseViewGenerator
                 $field = <<<HTML
                     <fieldset>
                         <label for="{$column['name']}">
-                            {{ __('{{table_name}}.{$column['name']}') }}
+                            {{ __('{$this->tableName}.{$column['name']}') }}
                         </label>
                         <input
                             type="{$this->getInputType($column['type'])}"
                             name="{$column['name']}"
                             id="{$column['name']}"
                             $required
-                            placeholder="{{ __('{{table_name}}.{$column['name']}') }}"
+                            placeholder="{{ __('{$this->tableName}.{$column['name']}') }}"
                             value="{{ old('{$column['name']}') }}"
                         >
                     </fieldset>
@@ -61,10 +61,7 @@ class CreateViewGenerator extends BaseViewGenerator
             $fields .= $field . "\n";
         }
         $placeHolders = [
-            '{{form_fields}}' => $fields,
-            '{{model}}' => $this->modelName,
-            '{{table_name}}' => $this->tableName,
-            '{{singular}}' => $this->singular,
+            '{{ form_fields }}' => $fields,
         ];
         $content = $this->replacePlaceholders($stubContent, $placeHolders);
         $viewPath = $this->getPath(resource_path("views/{$this->tableName}"));
@@ -72,7 +69,7 @@ class CreateViewGenerator extends BaseViewGenerator
         $filePath = $this->getPath("{$viewPath}/create.blade.php");
         File::put($filePath, $content);
         $this->generatedFiles[] = $filePath;
-        $this->command->info("View created: {$filePath}");
+        $this->command->info("✅ View created: {$filePath}");
 
         return [
             'generated_files' => $this->generatedFiles,

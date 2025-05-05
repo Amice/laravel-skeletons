@@ -80,21 +80,18 @@ class ControllerGenerator extends AbstractGenerator
             : implode("\n", $useStatements);
         // Replace placeholders in the stub file
         $placeholders = [
-            '{{className}}' => $className,
-            '{{model}}' => $this->modelName,
-            '{{plural}}' => $this->plural,
-            '{{singular}}' => $this->singular,
-            '{{useStatements}}' => $useStatementsString,
-            '{{relatedData}}' => $relatedData,
-            '{{relatedCompactCreate}}' => $relatedCompactCreateString,
-            '{{relatedCompactEdit}}' => $relatedCompactEdit,
+            '{{ className }}' => $className,
+            '{{ useStatements }}' => $useStatementsString,
+            '{{ relatedData }}' => $relatedData,
+            '{{ relatedCompactCreate }}' => $relatedCompactCreateString,
+            '{{ relatedCompactEdit }}' => $relatedCompactEdit,
         ];
         $content = $this->replacePlaceholders($stubContent, $placeholders);
-        $filePath = $this->getPath(app_path("Http/Controllers/{$className}.php"));
+        $filePath = $this->getPath(app_path("Http/Controllers/$className.php"));
         $this->createBackup($filePath);
         File::put($filePath, $content);
         $this->generatedFiles[] = $filePath;
-        $this->command->info("Controller created: {$filePath}");
+        $this->command->info("✅ Controller created: {$filePath}");
 
         return [
             'generated_files' => $this->generatedFiles,

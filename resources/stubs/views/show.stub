@@ -3,13 +3,13 @@
 @section('content')
     <div class="container">
         <!-- Page Title -->
-        <h1>{{ __('skeletons.details_of', ['model' => '{{singular}}']) }}</h1>
+        <h1>{{ __('skeletons.details_of', ['model' => '{{ singular }}']) }}</h1>
 
         <!-- Data Display -->
         <ul>
-            {{form_fields}}
+            {{ form_fields }}
         </ul>
         <!-- Back Button -->
-        <a href="{{ route('{{table_name}}.index') }}">{{ __('skeletons.back') }}</a>
+        <a href="{{ route('{{ table_name }}.index') }}">{{ __('skeletons.back') }}</a>
     </div>
 @endsection

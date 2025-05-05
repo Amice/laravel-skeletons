@@ -37,7 +37,7 @@ class TranslationsGenerator extends AbstractGenerator
             $content = "<?php\n\nreturn " . var_export($langArray, true) . ";\n";
             File::put($filePath, $content);
             $this->generatedFiles[] = $filePath;
-            $this->command->info("Language file created: {$filePath}");
+            $this->command->info("✅ Language file created: {$filePath}");
         }
 
         return [

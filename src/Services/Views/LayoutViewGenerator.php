@@ -33,7 +33,7 @@ class LayoutViewGenerator extends BaseViewGenerator
             if (!File::exists($destinationFile)) {
                 File::copy($stubFile, $destinationFile); // Copy the stub file to the destination
                 $this->generatedFiles[] = $destinationFile; // Track the generated file
-                $this->command->info("Layout created: {$destinationFile}");
+                $this->command->info("✅ Layout created: {$destinationFile}");
             }
         }
 

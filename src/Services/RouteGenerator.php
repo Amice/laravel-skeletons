@@ -21,25 +21,19 @@ class RouteGenerator extends AbstractGenerator
             $this->command->error($e->getMessage());
             return null;
         }
-        // Use $tableName directly for plural and derive singular
         $controller = "{$this->modelName}Controller";
-        $plural = $this->tableName; // Table name is the plural form
-        $singular = Str::singular($this->tableName); // Generate singular form
 
         $placeholders = [
-            '{{controller}}' => $controller,
-            '{{model}}' => $this->modelName,
-            '{{plural}}' => $plural,
-            '{{singular}}' => $singular,
+            '{{ controller }}' => $controller,
         ];
         $content = $this->replacePlaceholders($stubContent, $placeholders);
-        $filePath = self::getPath(base_path("routes/{$plural}.php"));
+        $filePath = self::getPath(base_path("routes/{$this->tableName}.php"));
         $this->createBackup($filePath);
         File::put($filePath, $content);
         $this->generatedFiles[] = $filePath;
         $this->updateWebRoutes();
 
-        $this->command->info("Routes for {$this->modelName} created successfully in routes" . DIRECTORY_SEPARATOR . "{$plural}.php");
+        $this->command->info("✅ Routes for {$this->modelName} created successfully in routes" . DIRECTORY_SEPARATOR . "{$this->tableName}.php");
 
         return [
             'generated_files' => $this->generatedFiles,
@@ -73,19 +67,19 @@ class RouteGenerator extends AbstractGenerator
     {
         foreach ($this->generatedFiles as $filePath) {
             if (File::exists($filePath)) {
-                $this->removeRequireFromWebRoutes($filePath);
+                self::removeRequireFromWebRoutes($filePath);
             }
         }
         parent::rollback();
     }
 
-    protected function removeRequireFromWebRoutes(string $filePath)
+    public static function removeRequireFromWebRoutes(string $filePath)
     {
-        $webRoutes = self::getPath(base_path("routes"  . DIRECTORY_SEPARATOR . "web.php"));
+        $webRoutes = self::getPath(base_path("routes/web.php"));
 
         // Check if web.php exists
         if (!File::exists($webRoutes)) {
-            $this->command->warn("web.php not found. Skipping removal of require instruction.");
+            echo "\n❗web.php not found. Skipping removal of require instruction.";
             return;
         }
 
@@ -94,13 +88,13 @@ class RouteGenerator extends AbstractGenerator
 
         // Generate the require_once line to remove
         $relativePath = Str::replace(base_path() . DIRECTORY_SEPARATOR, '', $filePath);
-        $requireLine = "require_once base_path('{$relativePath}');";
+        $requireLine = "require_once base_path('$relativePath');";
 
         // Remove the line if it exists
         if (Str::contains($webContent, $requireLine)) {
             $webContent = Str::replace($requireLine . "\n", '', $webContent);
             File::put($webRoutes, $webContent);
-            $this->command->info("Removed require instruction for {$relativePath} from web.php.");
+            echo "Removed require instruction for $relativePath from web.php.\n";
         }
     }
 }

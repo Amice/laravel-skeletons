@@ -5,7 +5,7 @@
     <!-- Page Title -->
     <div class="row mb-4">
         <div class="col">
-            <h1>{{ __('skeletons.list_of', ['models' => '{{plural}}']) }}</h1>
+            <h1>{{ __('skeletons.list_of', ['models' => __('{{ table_name }}.{{ table_name }}')]) }}</h1>
         </div>
     </div>
 
@@ -19,12 +19,12 @@
     <!-- Create Link and Search Field -->
     <div class="row mb-3">
         <div class="col-md-6">
-            <a href="{{ route('{{table_name}}.create') }}" class="btn btn-success">
+            <a href="{{ route('{{ table_name }}.create') }}" class="btn btn-success">
                 {{ __('skeletons.create') }}
             </a>
         </div>
         <div class="col-md-6">
-            @include('layouts.search', ['route' => '{{table_name}}.search'])
+            @include('layouts.search', ['route' => '{{ table_name }}.search'])
         </div>
     </div>
 
@@ -36,21 +36,24 @@
                     <thead class="thead-light">
                         <tr>
                             <!-- Dynamic Table Headers -->
-                            {{table_headers}}
+                            {{ table_headers }}
                             <th>{{ __('skeletons.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (${{plural}} as ${{singular}})
+                        @foreach (${{ plural }} as ${{ singular }})
                             <tr>
                                 <!-- Dynamic Table Columns -->
-                                {{table_rows}}
+                                {{ table_rows }}
                                 <!-- Action Buttons -->
                                 <td>
-                                    <a href="{{ route('{{table_name}}.edit', ${{singular}}) }}" class="btn btn-primary btn-sm">
+                                    <a href="{{ route('{{ table_name }}.edit', ${{ singular }}) }}" class="btn btn-primary btn-sm">
                                         {{ __('skeletons.edit') }}
                                     </a>
-                                    <form action="{{ route('{{table_name}}.destroy', ${{singular}}) }}" method="POST" class="d-inline-block">
+                                    <a href="{{ route('{{ table_name }}.show', ${{ singular }}) }}" class="btn btn-secondary btn-sm">
+                                        {{ __('skeletons.show') }}
+                                    </a>
+                                    <form action="{{ route('{{ table_name }}.destroy', ${{ singular }}) }}" method="POST" class="d-inline-block">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-danger btn-sm">
@@ -69,7 +72,7 @@
     <!-- Pagination Links -->
     <div class="row mt-3">
         <div class="col">
-            {{ ${{plural}}->links() }}
+            {{ ${{ plural }}->links('pagination::bootstrap-5') }}
         </div>
     </div>
 </div>

@@ -26,15 +26,17 @@ class ModelGenerator extends AbstractGenerator
         $keyType = isset($this->keyType) && $this->keyType !== 'int'
             ? "\nprotected \$keyType = '{$this->keyType}';\n"
             : '';
-
+        $noTimestamps = empty($parsedData['hasTimestamps'])
+            ? "public \$timestamps = false;\n"
+            : '';
         // Define the placeholders and their replacements.
         $placeholders = [
             '{{ className }}'       => $this->modelName,
-            '{{ tableName }}'       => $this->tableName,
             '{{ fillable }}'        => $fillable,
             '{{ relationships }}'   => $relationshipsCode,
             '{{ primaryKey }}'      => $primaryKey,
             '{{ keyType }}'         => $keyType,
+            '{{ noTimestamps }}'    => $noTimestamps,
         ];
 
         // Replace placeholders in the stub.
@@ -47,7 +49,7 @@ class ModelGenerator extends AbstractGenerator
         // Write out the new model file.
         File::put($filePath, $content);
         $this->generatedFiles[] = $filePath;
-        $this->command->info("Model created: {$filePath}");
+        $this->command->info("✅ Model created: {$filePath}");
 
         return [
             'generated_files' => $this->generatedFiles,
@@ -89,7 +91,7 @@ class ModelGenerator extends AbstractGenerator
                 }
             } else {
                 // Log a warning if the related model file isn’t found.
-                $this->command->warn("Related model file not found: {$relatedModelPath}");
+                $this->command->warn("❗Related model file not found: {$relatedModelPath}");
             }
         }
     }

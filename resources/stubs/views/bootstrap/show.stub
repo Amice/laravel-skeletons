@@ -1,0 +1,28 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="container mt-4">
+    <!-- Page Title -->
+    <div class="row">
+        <div class="col">
+            <h1>{{ __('skeletons.details_of', ['model' => '{{ singular }}']) }}</h1>
+        </div>
+    </div>
+
+    <!-- Data Display -->
+    <div class="row mt-3">
+        <div class="col">
+            <ul class="list-group">
+                {{ form_fields }}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="row mt-3">
+        <div class="col">
+            <a href="{{ route('{{ table_name }}.index') }}" class="btn btn-primary">{{ __('skeletons.back') }}</a>
+        </div>
+    </div>
+</div>
+@endsection

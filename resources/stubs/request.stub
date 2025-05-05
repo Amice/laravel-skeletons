@@ -15,7 +15,7 @@ class {{ className }} extends FormRequest
     {
         if ($this->method() === 'PATCH' || $this->method() === 'PUT') {
             return [
-                {{ patch_rules }}
+                {{ patchRules }}
             ];
         }
         return [

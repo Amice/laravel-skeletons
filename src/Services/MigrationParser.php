@@ -22,8 +22,9 @@ class MigrationParser
         $tableName = self::extractTableName($content);
         $columns = self::extractColumns($content);
         $relationships = self::extractRelationships($content);
+        $hasTimestamps = Str::contains($content, '$table->timestamps');
 
-        return compact('tableName', 'columns', 'relationships');
+        return compact('tableName', 'columns', 'relationships', 'hasTimestamps');
     }
 
     public static function collectEntities(array $parsedData, array &$entities): void
@@ -60,7 +61,7 @@ class MigrationParser
         }
 
         if (!empty($missing)) {
-            throw new \Exception("Related migrations not found for tables: " . implode(', ', $missing) . ". Halting the process.");
+            throw new \Exception("❗Related migrations not found for tables: " . implode(', ', $missing) . ". Halting the process.");
         }
     }
 

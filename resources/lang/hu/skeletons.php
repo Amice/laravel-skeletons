@@ -6,7 +6,9 @@ return [
     'name_max_length' => 'A megnevezés mező hossza legfeljebb 255 karakter lehet.',
     'name_required' => 'A megnevezés mező kitöltése kötelező.',
     'create' => 'Új',
+    'creating' => 'Új :model',
     'edit' => 'Módosít',
+    'modifying' => ':Model módosítása',
     'name' => 'Név',
     'save' => 'Ment',
     'cancel' => 'Mégse',
@@ -20,4 +22,5 @@ return [
     'search' => 'Keres',
     'show' => 'Mutat',
     'select' => '-- Válassz --',
+    'all_rights_reserved' => 'Minden jog fenntartva.'
 ];

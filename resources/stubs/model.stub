@@ -9,9 +9,9 @@ class {{ className }} extends EloquentModel
 {
     use HasFactory;
 
-    protected $table = '{{ tableName }}';
+    protected $table = '{{ table_name }}';
 
     protected $fillable = [{{ fillable }}];
 
-    {{ primaryKey }}{{ keyType }}{{ relationships }}
+    {{ noTimestamps }}{{ primaryKey }}{{ keyType }}{{ relationships }}
 }

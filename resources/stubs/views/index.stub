@@ -3,35 +3,36 @@
 @section('content')
     <div class="container">
         <!-- Page Title -->
-        <h1>{{ __('skeletons.list_of', ['models' => '{{plural}}']) }}</h1>
+        <h1>{{ __('skeletons.list_of', ['models' => __('{{ table_name }}.{{ table_name }}')]) }}</h1>
 
         <!-- Success Message -->
         @include('layouts.success')
 
         <!-- Create Link -->
-        <a href="{{ route('{{table_name}}.create') }}" class="btn btn-success">{{ __('skeletons.create') }}</a>
+        <a href="{{ route('{{ table_name }}.create') }}" class="btn">{{ __('skeletons.create') }}</a>
 
         <!-- Search Field -->
-        @include('layouts.search', ['route' => '{{table_name}}.search'])
+        @include('layouts.search', ['route' => '{{ table_name }}.search'])
 
         <!-- Data Table -->
         <table class="table">
             <thead>
                 <tr>
                     <!-- Dynamic Table Headers -->
-                    {{table_headers}}
+                    {{ table_headers }}
                     <th>{{ __('skeletons.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (${{plural}} as ${{singular}})
+                @foreach (${{ plural }} as ${{ singular }})
                     <tr>
                         <!-- Dynamic Table Columns -->
-                        {{table_rows}}
+                        {{ table_rows }}
                         <!-- Action Buttons -->
                         <td>
-                            <a href="{{ route('{{table_name}}.edit', ${{singular}}) }}" class="btn btn-primary">{{ __('skeletons.edit') }}</a>
-                            <form action="{{ route('{{table_name}}.destroy', ${{singular}}) }}" method="POST" style="display:inline-block;">
+                            <a href="{{ route('{{ table_name }}.edit', ${{ singular }}) }}" class="btn">{{ __('skeletons.edit') }}</a>
+                            <a href="{{ route('{{ table_name }}.show', ${{ singular }}) }}" class="btn">{{ __('skeletons.show') }}</a>
+                            <form action="{{ route('{{ table_name }}.destroy', ${{ singular }}) }}" method="POST" style="display:inline-block;">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger">{{ __('skeletons.delete') }}</button>
@@ -44,7 +45,7 @@
 
         <!-- Pagination Links -->
         <div class="pagination">
-            {{ ${{plural}}->links() }}
+            {{ ${{ plural }}->links(()) }}
         </div>
     </div>
 @endsection

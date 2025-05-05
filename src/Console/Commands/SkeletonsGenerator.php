@@ -4,20 +4,22 @@ namespace App\Console\Commands;
 
 use App\Services\AbstractGenerator;
 use App\Services\ControllerGenerator;
+use App\Services\MigrationParser;
 use App\Services\ModelGenerator;
 use App\Services\RequestGenerator;
-use App\Services\MigrationParser;
 use App\Services\RouteGenerator;
+use App\Services\SeederGenerator;
 use App\Services\TranslationsGenerator;
 use App\Services\ViewGenerator;
-use App\Services\MenuGenerator;
+use App\Services\Views\MenuGenerator;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 use Symfony\Component\Finder\Finder;
 
 /**
- * Class SkeletonsGenerator
+ * Class GenerateFiles
  *
  * This command generates the necessary files for a Laravel application based
  * on a given migration file. It processes models, controllers, requests,
@@ -29,7 +31,6 @@ use Symfony\Component\Finder\Finder;
  * files within the project.
  *
  * @package App\Console\Commands
- * @author László Kovács
  */
 class SkeletonsGenerator extends Command
 {
@@ -41,7 +42,9 @@ class SkeletonsGenerator extends Command
     protected $signature = 'app:make-skeletons
         {--migration= : The migration file to be used, e.g. create_products_table}
         {--with-bootstrap : Add this option if you want the views to be generated with Bootstrap support}
-        {--clean-up : Remove all .bak files from the folders and exit}';
+        {--no-copyright : If set, generated files will omit the copyright header}
+        {--cleanup : Remove all .bak files from the folders and exit}
+        {--purge : Remove all generated file for given migration}';
 
     /**
      * The console command description.
@@ -62,6 +65,7 @@ class SkeletonsGenerator extends Command
     protected array $allGeneratedFiles = [
         'generated_files' => [],
         'backup_files'    => [],
+        'menu_items'      => [],
     ];
 
     /**
@@ -76,14 +80,20 @@ class SkeletonsGenerator extends Command
     public function handle(): void
     {
         // Clean-up mode: remove all .bak files and exit.
-        if ($this->option('clean-up')) {
+        if ($this->option('cleanup')) {
             $this->cleanupBakFiles();
             return;
         }
 
         $migrationName = $this->option('migration');
         if (!$migrationName) {
-            $this->error('Please provide the migration name using --migration= option.');
+            $this->error('❗Please provide the migration name using --migration= option.');
+            return;
+        }
+
+        $logFile = AbstractGenerator::getPath(storage_path("app/skeletons_log/$migrationName.json"));
+        if ($this->option('purge')) {
+            $this->purgeGeneratedFiles($migrationName, $logFile);
             return;
         }
 
@@ -92,7 +102,7 @@ class SkeletonsGenerator extends Command
         // Retrieve the migration file path using a glob pattern.
         $migrationFilePath = glob(AbstractGenerator::getPath(database_path("migrations/*_$migrationName.php")));
         if (empty($migrationFilePath)) {
-            $this->error("Migration file '$migrationName' not found.");
+            $this->error("❗Migration file '$migrationName' not found.");
             return;
         }
 
@@ -120,7 +130,10 @@ class SkeletonsGenerator extends Command
             $this->processPhase(TranslationsGenerator::class, $entities);
 
             // Phase 7: Generate Menus.
-            $this->processPhase(MenuGenerator::class, $entities);
+            $this->processPhase(MenuGenerator::class, $entities, [$withBootStrap]);
+
+            // Phase 8: Generate Seeders
+            $this->processPhase(SeederGenerator::class, $entities);
         } catch (Exception $e) {
             $this->error($e->getMessage());
 
@@ -128,17 +141,30 @@ class SkeletonsGenerator extends Command
             foreach ($this->allGeneratedFiles['generated_files'] as $file) {
                 if (File::exists($file)) {
                     File::delete($file);
-                    $this->info("Rolled back file: $file");
+                    $this->info("✅ Rolled back file: $file");
                 }
             }
+            $this->allGeneratedFiles['generated_files'] = [];
+
             // Rollback: Restore backups.
             foreach ($this->allGeneratedFiles['backup_files'] as $original => $backup) {
                 if (File::exists($backup)) {
                     File::move($backup, $original);
-                    $this->info("Restored backup for: $original");
+                    $this->info("✅ Restored backup for: $original");
+                    // Add the restored file to the generated_files list if it's not already there.
+                    if (!in_array($original, $this->allGeneratedFiles['generated_files'])) {
+                        $this->allGeneratedFiles['generated_files'][] = $original;
+                    }
                 }
             }
-            return;
+            $this->allGeneratedFiles['backup_files'] = [];
+
+            // Rollback menu items
+            $this->removeMenuItems($this->allGeneratedFiles['menu_items']);
+            $this->allGeneratedFiles['menu_items'] = [];
+        } finally {
+            $this->saveGenerationLog($migrationName, $logFile);
+            $this->info("✅ Generation log saved to {$logFile}");
         }
     }
 
@@ -167,12 +193,12 @@ class SkeletonsGenerator extends Command
                     $deletedCount++;
                 }
             } catch (Exception $e) {
-                $this->error("Error deleting file $filePath: " . $e->getMessage());
+                $this->error("❗Error deleting file $filePath: " . $e->getMessage());
             }
         }
 
         if ($deletedCount > 0) {
-            $this->info("Cleanup complete, $deletedCount backup files removed.");
+            $this->info("✅ Cleanup complete, $deletedCount backup files removed.");
         } else {
             $this->info("No backup (.bak) files found.");
         }
@@ -197,6 +223,10 @@ class SkeletonsGenerator extends Command
         $this->allGeneratedFiles['backup_files'] = array_merge(
             $this->allGeneratedFiles['backup_files'],
             $result['backup_files'] ?? []
+        );
+        $this->allGeneratedFiles['menu_items'] = array_merge(
+            $this->allGeneratedFiles['menu_items'],
+            $result['menu_items'] ?? []
         );
     }
 
@@ -231,4 +261,131 @@ class SkeletonsGenerator extends Command
             }
         }
     }
+
+    /**
+     * Purges previously generated files and backups for a given migration.
+     *
+     * @param string $migrationName The migration name associated with the generated files.
+     * @param string $logFile The log file name.
+     *
+     * @return void
+     */
+    protected function purgeGeneratedFiles(string $migrationName, string $logFile): void
+    {
+        $this->info("Purging all generated files for migration: $migrationName");
+
+        $message = "No generation log found for migration: $migrationName";
+        if (File::exists($logFile)) {
+            $filesLog = json_decode(File::get($logFile), true);
+
+            // Delete generated files.
+            if (!empty($filesLog['generated_files'])) {
+                foreach ($filesLog['generated_files'] as $file) {
+                    if (Str::contains($file, 'routes')) {
+                        RouteGenerator::removeRequireFromWebRoutes($file);
+                    }
+                    if (File::exists($file)) {
+                        File::delete($file);
+                        $this->info("Deleted generated file: {$file}");
+                    }
+                }
+            }
+            // Delete backup files.
+            if (!empty($filesLog['backup_files'])) {
+                foreach ($filesLog['backup_files'] as $original => $backup) {
+                    if (File::exists($backup)) {
+                        File::delete($backup);
+                        $this->info("Deleted backup file: {$backup}");
+                    }
+                }
+            }
+            // Delete menu items.
+            $this->removeMenuItems($filesLog['menu_items']);
+            // Remove the log file after purge.
+            File::delete($logFile);
+            $message = "Removed log file: $logFile";
+        }
+        $this->info($message);
+
+        // Additionally, clean up any stray .bak files in the project.
+//        $this->cleanupBakFiles();
+
+        $this->info("✅ Purge process is complete!");
+    }
+
+    /**
+     * Save the generation log for the given migration.
+     *
+     * If a log file already exists, it reads and decodes it to an array,
+     * merges it with the current generation data, removes duplicate file entries,
+     * and writes the merged data back to the log file.
+     *
+     * @param string $migrationName The migration name identifier.
+     * @param string $logFile The log file name.
+     *
+     * @return void
+     */
+    protected function saveGenerationLog(string $migrationName, string $logFile): void
+    {
+        // Get current generation log data.
+        $newLogData = $this->allGeneratedFiles;
+        $finalLogData = $newLogData;
+
+        // If the log file exists, merge its data with the new one.
+        if (File::exists($logFile)) {
+            $existing = json_decode(File::get($logFile), true);
+            if (!is_array($existing)) {
+                $existing = [
+                    'generated_files' => [],
+                    'backup_files'    => [],
+                ];
+            }
+
+            // Merge and remove duplicates.
+            $mergedGeneratedFiles = array_merge($existing['generated_files'], $newLogData['generated_files']);
+            $mergedBackupFiles    = array_merge($existing['backup_files'], $newLogData['backup_files']);
+
+            // Ensure the arrays contain unique entries.
+            $existing['generated_files'] = array_values(array_unique($mergedGeneratedFiles));
+            $existing['backup_files']    = array_values(array_unique($mergedBackupFiles));
+
+            $finalLogData = $existing;
+        }
+
+        // Save the merged log back to the file.
+        File::ensureDirectoryExists(File::dirname($logFile));
+        File::put($logFile, json_encode($finalLogData));
+        $this->info("Generation log updated: {$logFile}");
+    }
+
+    private function removeMenuItem(string $navFilePath, string $content, string $menuItem): void
+    {
+        // Remove the menu item from the content
+        if (Str::contains($content, $menuItem)) {
+            $content = Str::replaceFirst("$menuItem\n", '', $content); // Ensure proper indentation handling
+            File::put($navFilePath, $content);
+            $this->info("✅ Menu item successfully removed from nav.blade.php.");
+        } else {
+            $this->warn("❗Menu item not found in nav.blade.php. Rollback skipped.");
+        }
+    }
+
+    private function removeMenuItems($menuItems): void
+    {
+        if (!empty($menuItems)) {
+            $navFilePath = AbstractGenerator::getPath(resource_path('views/layouts/nav.blade.php'));
+            // Ensure nav.blade.php exists
+            if (!File::exists($navFilePath)) {
+                $this->warn("❗nav.blade.php not found. Cannot perform rollback.");
+                return;
+            }
+//            $content = File::get($navFilePath);
+            foreach ($menuItems as $menuItem) {
+                $content = File::get($navFilePath);
+                $this->removeMenuItem($navFilePath, $content, $menuItem);
+            }
+        }
+    }
+
+
 }

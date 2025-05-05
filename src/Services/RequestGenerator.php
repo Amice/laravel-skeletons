@@ -48,7 +48,7 @@ class RequestGenerator extends AbstractGenerator
         $placeholders = [
             '{{ className }}' => $className,
             '{{ rules }}' => $rules,
-            '{{ patch_rules }}' => $patchRules,
+            '{{ patchRules }}' => $patchRules,
             '{{ messages }}' => $strMessages,
         ];
         $content = $this->replacePlaceholders($stubContent, $placeholders);
@@ -57,7 +57,7 @@ class RequestGenerator extends AbstractGenerator
         File::put($filePath, $content);
         $this->generatedFiles[] = $filePath;
 
-        $this->command->info("Request created: {$filePath}");
+        $this->command->info("✅ Request created: {$filePath}");
 
         // Update the language file for validation messages.
         $this->updateValidationLanguageFiles();
@@ -185,7 +185,7 @@ class RequestGenerator extends AbstractGenerator
             // Ensure the file exists or create a new one.
             if (!File::exists($filePath)) {
                 File::put($filePath, "<?php\n\nreturn [\n\n];");
-                $this->command->info("Created validation file for locale: {$locale}");
+                $this->command->info("✅ Created validation file for locale: {$locale}");
             }
 
             // Load existing messages.

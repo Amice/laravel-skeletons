@@ -3,7 +3,7 @@
 @section('content')
     <div class="container">
         <!-- Page Title -->
-        <h1>{{ __('skeletons.create') }} {{ __('{{table_name}}.{{singular}}') }}</h1>
+        <h1>{{ __('skeletons.creating', ['model' => strtolower(__('{{ table_name }}.{{ singular }}'))]) }}</h1>
 
         <!-- Success Message -->
         @include('layouts.success')
@@ -12,13 +12,13 @@
         @include('layouts.errors')
 
         <!-- Form -->
-        <form action="{{ route('{{table_name}}.store') }}" method="POST">
+        <form action="{{ route('{{ table_name }}.store') }}" method="POST">
             @csrf
-            {{form_fields}}
+            {{ form_fields }}
             <!-- Save Button -->
             <button type="submit">{{ __('skeletons.save') }}</button>
             <!-- Cancel Button -->
-            <a href="{{ route('{{table_name}}.index') }}">{{ __('skeletons.cancel') }}</a>
+            <a href="{{ route('{{ table_name }}.index') }}">{{ __('skeletons.cancel') }}</a>
         </form>
     </div>
 @endsection

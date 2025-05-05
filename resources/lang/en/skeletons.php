@@ -7,7 +7,9 @@ return [
     'name_max_length' => 'The name may not be greater than 255 characters.',
     'name_required' => 'The name field is required.',
     'create' => 'New',
+    'creating' => 'New :model',
     'edit' => 'Edit',
+    'modifying' => 'Modifying :Model',
     'name' => 'Name',
     'save' => 'Save',
     'cancel' => 'Cancel',
@@ -21,4 +23,5 @@ return [
     'search' => 'Search',
     'show' => 'Show',
     'select' => '-- Select --',
+    'all_rights_reserved' => 'All rights reserved.',
 ];

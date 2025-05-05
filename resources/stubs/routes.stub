@@ -1,15 +1,15 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{{controller}};
+use App\Http\Controllers\{{ controller }};
 
-// Routes for {{model}}
-Route::get('/{{plural}}', [{{controller}}::class, 'index'])->name('{{plural}}.index');
-Route::post('/{{plural}}', [{{controller}}::class, 'store'])->name('{{plural}}.store');
-Route::get('/{{plural}}/create', [{{controller}}::class, 'create'])->name('{{plural}}.create');
-Route::post('/{{plural}}/search', [{{controller}}::class, 'search'])->name('{{plural}}.search');
+// Routes for {{ model }}
+Route::get('/{{ table_name }}', [{{ controller }}::class, 'index'])->name('{{ table_name }}.index');
+Route::post('/{{ table_name }}', [{{ controller }}::class, 'store'])->name('{{ table_name }}.store');
+Route::get('/{{ table_name }}/create', [{{ controller }}::class, 'create'])->name('{{ table_name }}.create');
+Route::post('/{{ table_name }}/search', [{{ controller }}::class, 'search'])->name('{{ table_name }}.search');
 
-Route::get('/{{plural}}/{{{singular}}}', [{{controller}}::class, 'show'])->name('{{plural}}.show');
-Route::put('/{{plural}}/{{{singular}}}', [{{controller}}::class, 'update'])->name('{{plural}}.update');
-Route::get('/{{plural}}/{{{singular}}}/edit', [{{controller}}::class, 'edit'])->name('{{plural}}.edit');
-Route::delete('/{{plural}}/{{{singular}}}', [{{controller}}::class, 'destroy'])->name('{{plural}}.destroy');
+Route::get('/{{ table_name }}/{{{ singular }}}', [{{ controller }}::class, 'show'])->name('{{ table_name }}.show');
+Route::put('/{{ table_name }}/{{{ singular }}}', [{{ controller }}::class, 'update'])->name('{{ table_name }}.update');
+Route::get('/{{ table_name }}/{{{ singular }}}/edit', [{{ controller }}::class, 'edit'])->name('{{ table_name }}.edit');
+Route::delete('/{{ table_name }}/{{{ singular }}}', [{{ controller }}::class, 'destroy'])->name('{{ table_name }}.destroy');

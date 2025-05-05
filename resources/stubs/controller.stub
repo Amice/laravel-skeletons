@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-{{useStatements}}
+{{ useStatements }}
 use Illuminate\Http\Request;
 
-class {{className}} extends Controller
+class {{ className }} extends Controller
 {
     /**
      * Display a listing of the resource with pagination.
@@ -13,9 +13,9 @@ class {{className}} extends Controller
     public function index()
     {
         // Retrieve paginated results
-        ${{plural}} = {{model}}::paginate(config('app.pagination_limit', 20));
+        ${{ plural }} = {{ model }}::paginate(config('app.pagination_limit', 20));
 
-        return view('{{plural}}.index', compact('{{plural}}'));
+        return view('{{ table_name }}.index', compact('{{ plural }}'));
     }
 
     /**
@@ -23,20 +23,20 @@ class {{className}} extends Controller
      */
     public function create()
     {
-        {{relatedData}}
+        {{ relatedData }}
 
-        return view('{{plural}}.create'{{relatedCompactCreate}});
+        return view('{{ table_name }}.create'{{ relatedCompactCreate }});
     }
 
     /**
      * Store a newly created resource in storage using validated request data.
      */
-    public function store({{model}}Request $request)
+    public function store({{ model }}Request $request)
     {
-        {{model}}::create($request->validated());
+        {{ model }}::create($request->validated());
 
-        return redirect()->route('{{plural}}.index')
-            ->with('success', __('skeletons.created_successfully', ['model' => '{{model}}']));
+        return redirect()->route('{{ table_name }}.index')
+            ->with('success', __('skeletons.created_successfully', ['model' => '{{ model }}']));
     }
 
     /**
@@ -44,9 +44,9 @@ class {{className}} extends Controller
      */
     public function show(string $id)
     {
-        ${{singular}} = {{model}}::findOrFail($id);
+        ${{ singular }} = {{ model }}::findOrFail($id);
 
-        return view('{{plural}}.show', compact('{{singular}}'));
+        return view('{{ table_name }}.show', compact('{{ singular }}'));
     }
 
     /**
@@ -54,21 +54,21 @@ class {{className}} extends Controller
      */
     public function edit(string $id)
     {
-        ${{singular}} = {{model}}::findOrFail($id);{{relatedData}}
-        return view('{{plural}}.edit', compact({{relatedCompactEdit}}));
+        ${{ singular }} = {{ model }}::findOrFail($id);{{ relatedData }}
+        return view('{{ table_name }}.edit', compact({{ relatedCompactEdit }}));
     }
 
     /**
      * Update the specified resource in storage using validated request data.
      */
-    public function update({{model}}Request $request, string $id)
+    public function update({{ model }}Request $request, string $id)
     {
-        ${{singular}} = {{model}}::findOrFail($id);
+        ${{ singular }} = {{ model }}::findOrFail($id);
 
-        ${{singular}}->update($request->validated());
+        ${{ singular }}->update($request->validated());
 
-        return redirect()->route('{{plural}}.index')
-            ->with('success', __('skeletons.updated_successfully', ['model' => '{{model}}']));
+        return redirect()->route('{{ plural }}.index')
+            ->with('success', __('skeletons.updated_successfully', ['model' => '{{ model }}']));
     }
 
     /**
@@ -76,14 +76,14 @@ class {{className}} extends Controller
      */
     public function destroy(string $id)
     {
-        ${{singular}} = {{model}}::find($id);
+        ${{ singular }} = {{ model }}::find($id);
 
-        if (${{singular}}) {
-            ${{singular}}->delete();
+        if (${{ singular }}) {
+            ${{ singular }}->delete();
         }
 
-        return redirect()->route('{{plural}}.index')
-            ->with('success', __('skeletons.deleted_successfully', ['model' => '{{model}}']));
+        return redirect()->route('{{ plural }}.index')
+            ->with('success', __('skeletons.deleted_successfully', ['model' => '{{ model }}']));
     }
 
     /**
@@ -92,8 +92,8 @@ class {{className}} extends Controller
     public function search(Request $request)
     {
         $needle = $request->get('needle');
-        ${{plural}} = {{model}}::orderBy('name')->where('name', 'like', "%{$needle}%")->paginate(config('app.pagination_limit', 20));
+        ${{ plural }} = {{ model }}::orderBy('name')->where('name', 'like', "%{$needle}%")->paginate(config('app.pagination_limit', 20));
 
-        return view('{{plural}}.index', compact('{{plural}}'));
+        return view('{{ plural }}.index', compact('{{ plural }}'));
     }
 }
