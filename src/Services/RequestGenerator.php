@@ -185,6 +185,7 @@ class RequestGenerator extends AbstractGenerator
             // Ensure the file exists or create a new one.
             if (!File::exists($filePath)) {
                 File::put($filePath, "<?php\n\nreturn [\n\n];");
+                $this->generatedFiles[] = $filePath;
                 $this->command->info("✅ Created validation file for locale: {$locale}");
             }
 
