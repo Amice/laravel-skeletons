@@ -12,7 +12,8 @@ The `app:make-skeletons` command is a comprehensive migration-driven code-genera
 
    - **Models:** Complete with fillable attributes, relationships, and configuration (such as timestamp settings).
    - **Controllers:** Ready-to-use controllers with stubs tailored for your chosen CSS framework (Bootstrap or Tailwind).
-   - **Views:** CRUD views that integrate with your layout and support multilingual setups.
+   - **Requests:** Fields marked as non-nullable in your migration are automatically assigned the required validation rule when creating or updating records. Additionally, corresponding language files containing validation messages prefixed with `validate_` are generated to facilitate multi-language support. 
+   - **Views:** CRUD views that integrate with your layout and support multilingual setups. If auth middleware is detected Views for data-modifying operations are automatically secured, only authenticated users will have access.
    - **Seeders:**  
      Bulk import logic that dynamically adjusts for performance with large datasets and includes progress feedback.  
      **Note:** Data source CSV files should be placed in the `seeders/data` folder with the same name as the migration’s table name (e.g., if your migration creates a `users` table, the corresponding CSV file should be named `users.csv`).
@@ -30,8 +31,26 @@ The `app:make-skeletons` command is a comprehensive migration-driven code-genera
      Route::post('/examples/search', [ExampleController::class, 'search'])->name('examples.search');
      ```
 
-     Additionally, each generated route file is automatically required in your main `web.php` file so that your routes are seamlessly integrated into the application.
+     Additionally, if authentication middleware is available in your application, the generated routes for data-modifying operations (store, update, destroy, etc.) are automatically wrapped with it to ensure secure access. 
+	 
+	 ```php
+	 // Routes not requiring authentication
+	 Route::get('/examples', [ExampleController::class, 'index'])->name('examples.index');
+	 Route::post('/examples/search', [ExampleController::class, 'search'])->name('examples.search');
 
+	 // Routes requiring authentication
+	 Route::middleware('auth')->group(function () {
+		Route::post('/{{ table_name }}', [{{ controller }}::class, 'store'])->name('{{ table_name }}.store');
+		Route::post('/examples', [ExampleController::class, 'store'])->name('examples.store');
+		Route::get('/examples/create', [ExampleController::class, 'create'])->name('examples.create');
+		Route::patch('/examples/{example}', [ExampleController::class, 'update'])->name('examples.update');
+		Route::get('/examples/{example}/edit', [ExampleController::class, 'edit'])->name('examples.edit');
+		Route::delete('/examples/{example}', [ExampleController::class, 'destroy'])->name('examples.destroy');
+	 });
+	 Route::get('/examples/{example}', [ExampleController::class, 'show'])->name('examples.show');
+	```
+	All generated route files are automatically required in your main web.php file, so your routes are seamlessly integrated into the application.
+	
 - **Language Files Generation and Copy:**  
   The command generates a separate language file for each model. The file name is derived directly from the table name. These generated language files are then copied recursively into your project’s `resources/lang` folder, preserving any subdirectory structure for different locales.  
   
