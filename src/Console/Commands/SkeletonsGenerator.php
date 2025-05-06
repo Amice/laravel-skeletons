@@ -2,16 +2,16 @@
 
 namespace KovacsLaci\LaravelSkeletons\Console\Commands;
 
-use App\Services\AbstractGenerator;
-use App\Services\ControllerGenerator;
-use App\Services\MigrationParser;
-use App\Services\ModelGenerator;
-use App\Services\RequestGenerator;
-use App\Services\RouteGenerator;
-use App\Services\SeederGenerator;
-use App\Services\TranslationsGenerator;
-use App\Services\ViewGenerator;
-use App\Services\Views\MenuGenerator;
+use KovacsLaci\LaravelSkeletons\Services\AbstractGenerator;
+use KovacsLaci\LaravelSkeletons\Services\ControllerGenerator;
+use KovacsLaci\LaravelSkeletons\Services\MigrationParser;
+use KovacsLaci\LaravelSkeletons\Services\ModelGenerator;
+use KovacsLaci\LaravelSkeletons\Services\RequestGenerator;
+use KovacsLaci\LaravelSkeletons\Services\RouteGenerator;
+use KovacsLaci\LaravelSkeletons\Services\SeederGenerator;
+use KovacsLaci\LaravelSkeletons\Services\TranslationsGenerator;
+use KovacsLaci\LaravelSkeletons\Services\ViewGenerator;
+use KovacsLaci\LaravelSkeletons\Services\Views\MenuGenerator;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;

@@ -1,7 +1,7 @@
 <?php
 namespace KovacsLaci\LaravelSkeletons\Services\Views;
 
-use App\Services\AbstractGenerator;
+use KovacsLaci\LaravelSkeletons\Services\AbstractGenerator;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 

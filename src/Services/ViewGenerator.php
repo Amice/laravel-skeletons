@@ -2,12 +2,12 @@
 
 namespace KovacsLaci\LaravelSkeletons\Services;
 
-use App\Services\Views\BaseViewGenerator;
-use App\Services\Views\CreateViewGenerator;
-use App\Services\Views\EditViewGenerator;
-use App\Services\Views\IndexViewGenerator;
-use App\Services\Views\LayoutViewGenerator;
-use App\Services\Views\ShowViewGenerator;
+use KovacsLaci\LaravelSkeletons\Services\Views\BaseViewGenerator;
+use KovacsLaci\LaravelSkeletons\Services\Views\CreateViewGenerator;
+use KovacsLaci\LaravelSkeletons\Services\Views\EditViewGenerator;
+use KovacsLaci\LaravelSkeletons\Services\Views\IndexViewGenerator;
+use KovacsLaci\LaravelSkeletons\Services\Views\LayoutViewGenerator;
+use KovacsLaci\LaravelSkeletons\Services\Views\ShowViewGenerator;
 
 class ViewGenerator extends BaseViewGenerator
 {

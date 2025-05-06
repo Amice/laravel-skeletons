@@ -2,7 +2,7 @@
 
 namespace KovacsLaci\LaravelSkeletons\Services\Views;
 
-use App\Services\AbstractGenerator;
+use KovacsLaci\LaravelSkeletons\Services\AbstractGenerator;
 use Illuminate\Support\Str;
 
 abstract class BaseViewGenerator extends AbstractGenerator
