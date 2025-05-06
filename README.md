@@ -1,161 +1,95 @@
 # laravel-skeletons
-An artisan command to create the most common MVC files with content although without any css. It creates a skeleton for
- - controller, 
- - model, 
- - views, 
- - migration, 
- - request, 
- - seeder
+---
+### Laravel Skeletons Generator Command
 
-It's able to make index, create, edit and show views using the model->fillable property. 
+The `app:make-skeletons` command is a comprehensive migration-driven code-generation tool for Laravel applications. It automates the creation of your app’s core scaffolding with the following key features:
 
-It generates a sample file for layout into folder: 
+- **Migration Parsing and Related Entities Discovery:**  
+  The command reads a specified migration file to extract the table name, column definitions, and relationships. It automatically detects foreign key relationships and recursively examines related migrations. This means it generates all necessary files (models, controllers, views, seeders, etc.) for your main table as well as for any related tables, ensuring complete scaffolding for your database schema.
 
-    resources/views/layouts/app.example.blade.php. 
+- **File Generation:**  
+  Based on the parsed migration data, the command automatically generates:
 
-Just rename it to app.blade.php and add menu items.
+   - **Models:** Complete with fillable attributes, relationships, and configuration (such as timestamp settings).
+   - **Controllers:** Ready-to-use controllers with stubs tailored for your chosen CSS framework (Bootstrap or Tailwind).
+   - **Views:** CRUD views that integrate with your layout and support multilingual setups.
+   - **Seeders:**  
+     Bulk import logic that dynamically adjusts for performance with large datasets and includes progress feedback.  
+     **Note:** Data source CSV files should be placed in the `seeders/data` folder with the same name as the migration’s table name (e.g., if your migration creates a `users` table, the corresponding CSV file should be named `users.csv`).
+   - **Routes:**  
+     A separate route file is generated for each table, with the file name derived from the table name. These route files contain common CRUD route definitions, for example:
 
-The generated index view contains a search field and paginator. 
+     ```php
+     Route::post('/examples', [ExampleController::class, 'store'])->name('examples.store');
+     Route::get('/examples/create', [ExampleController::class, 'create'])->name('examples.create');
+     Route::patch('/examples/{example}', [ExampleController::class, 'update'])->name('examples.update');
+     Route::get('/examples/{example}/edit', [ExampleController::class, 'edit'])->name('examples.edit');
+     Route::delete('/examples/{example}', [ExampleController::class, 'destroy'])->name('examples.destroy');
+     Route::get('/examples', [ExampleController::class, 'index'])->name('examples.index');
+     Route::get('/examples/{example}', [ExampleController::class, 'show'])->name('examples.show');
+     Route::post('/examples/search', [ExampleController::class, 'search'])->name('examples.search');
+     ```
 
-## Setting up paginator
+     Additionally, each generated route file is automatically required in your main `web.php` file so that your routes are seamlessly integrated into the application.
 
-To setup the paginator add to config/app.php
+- **Language Files Generation and Copy:**  
+  The command generates a separate language file for each model. The file name is derived directly from the table name. These generated language files are then copied recursively into your project’s `resources/lang` folder, preserving any subdirectory structure for different locales.  
+  
+- **Customization Options:**  
+  Users can tailor the generation process with a variety of command-line options, such as:
+   - Selecting which CSS framework to use (Bootstrap or Tailwind).
+   - Controlling whether a copyright header is included in generated files.
+   - Adjusting batch sizes for seeder file insertion when dealing with large datasets.
 
-    'pagination_limit' => env('APP_PAGINATION_LIMIT', 20),
+By automating these repetitive tasks, intelligently discovering table relationships, managing data, route, and translation files seamlessly, and enforcing naming conventions, the `app:make-skeletons` command can significantly speed up your development process—allowing you to focus on building application-specific features rather than boilerplate code.
 
-and to .env file:
+**Important:** As the tool is built for the Laravel ecosystem, it expects table names to be in English plural form. Not adhering to this rule might lead to unexpected results in file naming and translation management.
 
-    APP_PAGINATION_LIMIT=20
+### Overview
 
+**Language Settings:**
+- **Environment Variables:**  
+  Update your `.env` file to specify your preferred language by setting:
+  ```
+  APP_LOCALE=en
+  APP_FALLBACK_LOCALE=en
+  ```
+  These values tell the application which language files to load and use as fallbacks.
 
-# How to use
-1. Install
-   
-    <code>composer require --dev kovacs-laci/laravel-skeletons</code>
+**Paginator Setup:**
+- **Configuration:**  
+  In your `config/app.php` file, add a key for pagination (with a default value from the environment):
+  ```php
+  'pagination_limit' => env('APP_PAGINATION_LIMIT', 20),
+  ```
+- **.env Configuration:**  
+  Then, in your `.env` file, define:
+  ```
+  APP_PAGINATION_LIMIT=20
+  ```
+  This ensures that your paginated views will display the desired number of items per page.
 
+**Usage Instructions:**
+1. **Installation:**  
+   Run the following Composer command to install the package as a development dependency:
+   ```
+   composer require --dev kovacs-laci/laravel-skeletons
+   ```
 
-2. Follow these steps:
+2. **Generating Files:**  
+   To generate the scaffolding, run the artisan command with the appropriate options. For example, if your migration file creates a table called `examples`, execute:
+   ```
+   php artisan app:make-skeletons --migration=create_examples_table
+   ```
+   *Note:* The migration timestamp can be omitted.
 
-    2.1. Run the following command, where table_name is the name of database table and model_name is the name of model representing the database table. 
+   **Optional Flags:**
+   - `--with-bootstrap`: Generates views with Bootstrap styling.
+   - `--purge`: Deletes all generated files for the specified migration.
+   - `--cleanup`: Deletes all backup (`.bak`) files.
+   - `--no-copyright`: Omits the copyright header from generated PHP files.
 
-        php artisan app:make-skeletons model_name table_name
+**Final Note:**  
+After following these steps, you’ll have your application’s language, pagination, and code scaffolding set up as intended. 
 
-    This command will create the following files:
-
-        Generating files for: Example (example / examples)...
-        
-        ✔ Created: <project-folder>\app\Http\Controllers\ExampleController.php
-        
-        ✔ Created: <project-folder>\app\Models\Example.php
-        
-        ✔ Created: <project-folder>\app\Http\Requests\ExampleRequest.php
-        
-        ✔ Created: <project-folder>\database\migrations\2025_04_23_192113_create_examples_table.php
-        
-        ✔ Created: <project-folder>\database\seeders\ExampleSeeder.php
-        
-        ✔ Created: <project-folder>\resources\views\examples\index.blade.php
-        
-        ✔ Created: <project-folder>\resources\views\examples\create.blade.php
-        
-        ✔ Created: <project-folder>\resources\views\examples\edit.blade.php
-        
-        ✔ Created: <project-folder>\resources\views\examples\show.blade.php
-        
-        ✅ All files generated successfully!
-        
-        ✅ web.php has been updated successfully!
-        
-        ✅ Language files have been created successfully!
-        
-        ❗ To create the database table(s) don't forget to run command: php artisan migrate
-
-    2.2 Add the necessary fields to the migration file.
-
-    2.3 Add fillable fields to the model.
-
-    2.4 Run the migrate command:
-    
-        php artisan migrate
-
-    2.5 Run the following command:
-
-        php artisan app:make-skeletons --update-views
-
-    This command will add fillable fields to the views. 
-
-    When fillable property is not set the database fields will be added to lists and forms.
-
-## Parameters
-
-- singleton: name of the model
-- plural: name of the database table
-
-## Options
-
---resource : Routes in routes/web.php will be generated as resource.
-
-        Route::post('/examples/search', [ExampleController::class, 'search'])->name('examples.search');
-        Route::resource('examples', ExampleController::class);
-
-otherwise:
-        
-        Route::post('/examples', [ExampleController::class, 'store'])->name('examples.store');
-        Route::get('/examples/create', [ExampleController::class, 'create'])->name('examples.create');
-        Route::patch('/examples/{example}', [ExampleController::class, 'update'])->name('examples.update');
-        Route::get('/examples/{example}/edit', [ExampleController::class, 'edit'])->name('examples.edit');
-        Route::delete('/examples/{example}', [ExampleController::class, 'destroy'])->name('examples.destroy');
-        Route::get('/examples', [ExampleController::class, 'index'])->name('examples.index');
-        Route::get('/examples/{example}', [ExampleController::class, 'show'])->name('examples.show');
-        Route::post('/examples/search', [ExampleController::class, 'search'])->name('examples.search');
-
---force : Overwrite all existing files
-
---with-auth : Routes will be generated with middleware
-
-      Route::middleware('auth')->group(function () {
-         Route::get('examples/create', [ExampleController::class, 'create'])->name('examples.create');
-         Route::post('examples', [ExampleController::class, 'store'])->name('examples.store');
-         Route::get('examples/example/edit', [ExampleController::class, 'edit'])->name('examples.edit');
-         Route::put('examples/example', [ExampleController::class, 'update'])->name('examples.update');
-         Route::delete('examples/example', [ExampleController::class, 'destroy'])->name('examples.destroy');
-      });
-      Route::post('/examples/search', [ExampleController::class, 'search'])->name('examples.search');
-      Route::resource('examples', ExampleController::class)->except(['create', 'store', 'edit', 'update', 'destroy']);
- 
---with-backup : Backup files before overwriting
-
---drop : Delete all generated files except .bak files
-
---purge : Delete all generated files including .bak files
-
---update-views : Update views based on model. Migration must be run first!
-
-If you used earlier --with-auth option then you should pay attention to index view and uncomment
-
-   @if(auth()->check()) and @endif
-
-to disable editing and deleting for not authenticated users.
-
-      {{-- uncomment @if / @endif when authentication is required --}}
-      @if(auth()->check())
-         <a href="{{ route('examples.edit', $example->id) }}">{{ __('skeletons.edit') }}</a>
-         <form action="{{ route('examples.destroy', $example->id) }}" method="POST" style="display:inline;">
-            @csrf
-            @method('DELETE')
-            <button type="submit">{{ __('skeletons.delete') }}</button>
-         </form>
-      @endif
-
-## Localization
-
-   Language files are located in resources/lang folder. Create messages.php for each language you would like to use.
-
-      <?php
-      return [
-         "timezone" => "Timezone",
-         "lang" => "Language",
-         "phone" => "Phone",
-      ];
-
-## Happy coding :-)
+**Happy coding!**
