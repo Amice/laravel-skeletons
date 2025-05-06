@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace KovacsLaci\LaravelSkeletons\Services;
 
 use App\Services\Views\BaseViewGenerator;
 use App\Services\Views\CreateViewGenerator;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace KovacsLaci\LaravelSkeletons\Services;
 
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;

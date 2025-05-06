@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace KovacsLaci\LaravelSkeletons\Console\Commands;
 
 use App\Services\AbstractGenerator;
 use App\Services\ControllerGenerator;

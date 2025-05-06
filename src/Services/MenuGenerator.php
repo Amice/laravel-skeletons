@@ -1,5 +1,5 @@
 <?php
-namespace App\Services;
+namespace KovacsLaci\LaravelSkeletons\Services;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;

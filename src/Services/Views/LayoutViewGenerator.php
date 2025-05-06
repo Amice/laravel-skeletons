@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Views;
+namespace KovacsLaci\LaravelSkeletons\Services\Views;
 
 use Illuminate\Support\Facades\File;
 
