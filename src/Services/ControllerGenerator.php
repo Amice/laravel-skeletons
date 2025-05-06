@@ -35,7 +35,7 @@ class ControllerGenerator extends AbstractGenerator
      */
     public function generate(): ?array
     {
-        $stubFileName = 'controller.stub';
+        $stubFileName = self::stub_path('controller.stub');
         try {
             $stubContent = self::getStubContent($stubFileName);
         }

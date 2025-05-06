@@ -9,9 +9,9 @@ class ModelGenerator extends AbstractGenerator
 {
     public function generate(): ?array
     {
-        // Try to get the stub content.
+        $stubFileName = self::stub_path('model.stub');
         try {
-            $stubContent = self::getStubContent('model.stub');
+            $stubContent = self::getStubContent($stubFileName);
         } catch (\Exception $e) {
             $this->command->error($e->getMessage());
             return null;

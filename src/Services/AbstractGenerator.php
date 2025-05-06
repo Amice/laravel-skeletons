@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 
 abstract class AbstractGenerator
 {
+    const BASE_PATH = 'vendor/kovacs-laci/laravel-skeletons/';
     protected $command;       // Command instance for feedback
     protected $parsedData;
     protected $tableName;     // Name of the table
@@ -79,7 +80,7 @@ HEADER;
 
     public static function getStubContent(string $stub): string
     {
-        $stubPath = self::getPath(resource_path("stubs/{$stub}"));
+        $stubPath = self::getPath($stub);
         if (!File::exists($stubPath)) {
             throw new \Exception("❗Stub file not found: {$stubPath}");
         }
@@ -132,4 +133,8 @@ HEADER;
         return Str::repeat(" ", $count * 4);
     }
 
+    static function stub_path(string $stub = ''): string
+    {
+        return self::getPath(self::BASE_PATH . "resources/stubs/$stub");
+    }
 }

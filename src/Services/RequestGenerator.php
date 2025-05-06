@@ -29,8 +29,9 @@ class RequestGenerator extends AbstractGenerator
      */
     public function generate(): ?array
     {
+        $stubFileName = self::stub_path('request.stub');
         try {
-            $stubContent = self::getStubContent('request.stub');
+            $stubContent = self::getStubContent($stubFileName);
         } catch (\Exception $e) {
             $this->command->error($e->getMessage());
             return null;

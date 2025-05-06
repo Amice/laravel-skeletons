@@ -13,7 +13,7 @@ class RouteGenerator extends AbstractGenerator
         // Determine if auth middleware is available
         $hasAuthMiddleware = in_array('auth', array_keys(app('router')->getMiddleware()));
 
-        $stubFileName = $hasAuthMiddleware ? 'routes_auth.stub' : 'routes.stub';
+        $stubFileName = $hasAuthMiddleware ? self::stub_path('routes_auth.stub') : self::stub_path('routes.stub');
         try {
             $stubContent = self::getStubContent($stubFileName);
         }

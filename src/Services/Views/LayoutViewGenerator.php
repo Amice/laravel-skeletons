@@ -13,9 +13,9 @@ class LayoutViewGenerator extends BaseViewGenerator
     {
         // Define paths
         $layoutsPath = $this->getPath(resource_path("views/layouts"));
-        $stubsPath = $this->getPath(resource_path("stubs/views/layouts"));
+        $stubsPath = self::stub_path("views/layouts");
         if ($this->withBootStrap) {
-            $stubsPath = $this->getPath(resource_path("stubs/views/layouts/bootstrap"));
+            $stubsPath = self::stub_path("views/layouts/bootstrap");
         }
 
         // Ensure the layouts directory exists

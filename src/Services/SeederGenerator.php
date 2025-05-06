@@ -15,9 +15,9 @@ class SeederGenerator extends AbstractGenerator
      */
     public function generate(): ?array
     {
-        // Load the stub content.
+        $stubFileName = self::stub_path('seeder.stub');
         try {
-            $stubContent = self::getStubContent("seeder.stub");
+            $stubContent = self::getStubContent($stubFileName);
         } catch (\Exception $e) {
             $this->command->error($e->getMessage());
             return null;

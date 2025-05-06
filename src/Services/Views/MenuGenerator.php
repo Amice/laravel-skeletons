@@ -9,7 +9,6 @@ class MenuGenerator extends BaseViewGenerator
 {
     protected array $addedItems = [];
 
-
     public function generate(): ?array
     {
         $routeName = $this->tableName;
