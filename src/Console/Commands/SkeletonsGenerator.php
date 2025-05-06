@@ -110,6 +110,15 @@ class SkeletonsGenerator extends Command
         $entities = MigrationParser::processMigrationFile($migrationFilePath[0]);
 
         try {
+            // Phase 0: copying language files.
+            $copiedFiles = TranslationsGenerator::copySkeletonsLangFiles();
+            if (!empty($copiedFiles)) {
+                foreach ($copiedFiles as $file) {
+                    $this->allGeneratedFiles['generated_files'][] = $file;
+                }
+                $this->info("✅ Skeletons lang files copied.");
+            }
+            
             // Phase 1: Generate Models and Update related models.
             $this->processPhase(ModelGenerator::class, $entities);
             $this->processPhase(ModelGenerator::class, $entities, [], 'updateRelatedModels');

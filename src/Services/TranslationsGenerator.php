@@ -46,4 +46,40 @@ class TranslationsGenerator extends AbstractGenerator
         ];
     }
 
+    public static function copySkeletonsLangFiles(): array
+    {
+        $sourceDir = self::getPath(self::BASE_PATH . 'resources/lang');
+        $targetDir = self::getPath(resource_path('lang'));
+        $copiedFiles = [];
+
+        // Ensure the target directory exists.
+        if (!File::exists($targetDir)) {
+            File::makeDirectory($targetDir, 0755, true);
+        }
+
+        // Create a RecursiveDirectoryIterator to iterate over the source directory.
+        $directory = new \RecursiveDirectoryIterator($sourceDir, \RecursiveDirectoryIterator::SKIP_DOTS);
+        $iterator = new \RecursiveIteratorIterator($directory, \RecursiveIteratorIterator::SELF_FIRST);
+
+        foreach ($iterator as $item) {
+            // Compute the relative subpath manually
+            $subPathName = ltrim(str_replace($sourceDir, '', $item->getPathname()), DIRECTORY_SEPARATOR);
+            $targetPath = $targetDir . DIRECTORY_SEPARATOR . $subPathName;
+
+            if ($item->isDir()) {
+                // Ensure the subdirectory exists in the target.
+                if (!File::exists($targetPath)) {
+                    File::makeDirectory($targetPath, 0755, true);
+                }
+            } else {
+                // If the file doesn't already exist in the target, copy it.
+                if (!File::exists($targetPath)) {
+                    File::copy($item->getPathname(), $targetPath);
+                    $copiedFiles[] = $targetPath;
+                }
+            }
+        }
+        return $copiedFiles;
+    }
+
 }
