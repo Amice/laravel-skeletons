@@ -1,7 +1,7 @@
 <!-- Order your soul. Reduce your wants. - Augustine -->
 @if($errors->any())
-    <div class="alert alert-warning">
-        <ul>
+    <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4" role="alert">
+        <ul class="list-disc list-inside">
             @foreach($errors->all() as $error)
                 <li>{{ $error }}</li>
             @endforeach

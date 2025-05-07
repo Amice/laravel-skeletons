@@ -8,6 +8,8 @@
             <h1>{{ __('skeletons.list_of', ['models' => __('{{ table_name }}.{{ table_name }}')]) }}</h1>
         </div>
     </div>
+    <!-- Error Message -->
+    @include('layouts.errors')
 
     <!-- Success Message -->
     <div class="row">
@@ -18,11 +20,13 @@
 
     <!-- Create Link and Search Field -->
     <div class="row mb-3">
+        {{ if_auth }}
         <div class="col-md-6">
             <a href="{{ route('{{ table_name }}.create') }}" class="btn btn-success">
                 {{ __('skeletons.create') }}
             </a>
         </div>
+        {{ endif }}
         <div class="col-md-6">
             @include('layouts.search', ['route' => '{{ table_name }}.search'])
         </div>
@@ -47,11 +51,12 @@
                                 {{ table_rows }}
                                 <!-- Action Buttons -->
                                 <td>
-                                    <a href="{{ route('{{ table_name }}.edit', ${{ singular }}) }}" class="btn btn-primary btn-sm">
-                                        {{ __('skeletons.edit') }}
-                                    </a>
                                     <a href="{{ route('{{ table_name }}.show', ${{ singular }}) }}" class="btn btn-secondary btn-sm">
                                         {{ __('skeletons.show') }}
+                                    </a>
+                                    {{ if_auth }}
+                                    <a href="{{ route('{{ table_name }}.edit', ${{ singular }}) }}" class="btn btn-primary btn-sm">
+                                        {{ __('skeletons.edit') }}
                                     </a>
                                     <form action="{{ route('{{ table_name }}.destroy', ${{ singular }}) }}" method="POST" class="d-inline-block">
                                         @csrf
@@ -60,6 +65,7 @@
                                             {{ __('skeletons.delete') }}
                                         </button>
                                     </form>
+                                    {{ endif }}
                                 </td>
                             </tr>
                         @endforeach

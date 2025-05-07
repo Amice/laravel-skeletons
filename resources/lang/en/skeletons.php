@@ -24,4 +24,5 @@ return [
     'show' => 'Show',
     'select' => '-- Select --',
     'all_rights_reserved' => 'All rights reserved.',
+    'search_column_missing' => 'The search column ":column" does not exist in the table.',
 ];

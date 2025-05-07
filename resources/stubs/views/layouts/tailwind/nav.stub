@@ -1,0 +1,10 @@
+<nav class="flex items-center justify-between bg-gray-800 p-4">
+    <!-- Home Link -->
+    <a href="{{ url('/') }}" class="text-white font-bold hover:text-gray-300">
+        {{ __('skeletons.home') }}
+    </a>
+    <!-- Dynamic Links List -->
+    <ul class="flex space-x-4">
+        <!-- Add dynamic links to models or pages here -->
+    </ul>
+</nav>

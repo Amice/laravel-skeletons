@@ -4,12 +4,16 @@
     <div class="container">
         <!-- Page Title -->
         <h1>{{ __('skeletons.list_of', ['models' => __('{{ table_name }}.{{ table_name }}')]) }}</h1>
+        <!-- Error Message -->
+        @include('layouts.errors')
 
         <!-- Success Message -->
         @include('layouts.success')
 
         <!-- Create Link -->
+        {{ if_auth }}
         <a href="{{ route('{{ table_name }}.create') }}" class="btn">{{ __('skeletons.create') }}</a>
+        {{ endif }}
 
         <!-- Search Field -->
         @include('layouts.search', ['route' => '{{ table_name }}.search'])
@@ -30,13 +34,15 @@
                         {{ table_rows }}
                         <!-- Action Buttons -->
                         <td>
-                            <a href="{{ route('{{ table_name }}.edit', ${{ singular }}) }}" class="btn">{{ __('skeletons.edit') }}</a>
                             <a href="{{ route('{{ table_name }}.show', ${{ singular }}) }}" class="btn">{{ __('skeletons.show') }}</a>
+                            {{ if_auth }}
+                            <a href="{{ route('{{ table_name }}.edit', ${{ singular }}) }}" class="btn">{{ __('skeletons.edit') }}</a>
                             <form action="{{ route('{{ table_name }}.destroy', ${{ singular }}) }}" method="POST" style="display:inline-block;">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger">{{ __('skeletons.delete') }}</button>
                             </form>
+                            {{ endif }}
                         </td>
                     </tr>
                 @endforeach

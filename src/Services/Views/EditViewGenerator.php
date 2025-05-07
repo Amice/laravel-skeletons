@@ -12,7 +12,7 @@ class EditViewGenerator extends BaseViewGenerator
     public function generate(): ?array
     {
         $stubFileName = 'edit.stub';
-        $stubFilePath = $this->withBootStrap ? self::stub_path("views/bootstrap/$stubFileName") : self::stub_path("views/$stubFileName");
+        $stubFilePath = $this->getStubFilePath($stubFileName);
         try {
             $stubContent = self::getStubContent($stubFilePath);
         }

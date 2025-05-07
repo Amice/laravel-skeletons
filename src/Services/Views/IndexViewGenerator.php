@@ -8,11 +8,18 @@ use Illuminate\Support\Str;
 
 class IndexViewGenerator extends BaseViewGenerator
 {
+    private bool $withAuth = false;
+
+    public function __construct($command, array $parsedData, $cssStyle = '', $withAuth = false)
+    {
+        parent::__construct($command, $parsedData, $cssStyle);
+        $this->withAuth = $withAuth;
+    }
 
     public function generate(): ?array
     {
         $stubFileName = 'index.stub';
-        $stubFilePath = $this->withBootStrap ? self::stub_path("views/bootstrap/$stubFileName") : self::stub_path("views/$stubFileName");
+        $stubFilePath = $this->getStubFilePath($stubFileName);
         try {
             $stubContent = self::getStubContent($stubFilePath);
         }
@@ -43,10 +50,14 @@ class IndexViewGenerator extends BaseViewGenerator
             $rowsArray[] = $rowItem;
         }
         $rows = implode("\n", $rowsArray);
+        $ifAuth = $this->withAuth ? "@if(auth()->check())" : '';
+        $endif = $this->withAuth ? "@endif" : '';
 
         $placeHolders = [
             '{{ table_headers }}' => $headers,
-            '{{ table_rows }}'     => $rows,
+            '{{ table_rows }}'    => $rows,
+            '{{ if_auth }}'       => $ifAuth,
+            '{{ endif }}'         => $endif,
         ];
         $content = $this->replacePlaceholders($stubContent, $placeHolders);
         $viewPath = $this->getPath(resource_path("views/{$this->tableName}"));

@@ -41,7 +41,8 @@ class SkeletonsGenerator extends Command
      */
     protected $signature = 'app:make-skeletons
         {--migration= : The migration file to be used, e.g. create_products_table}
-        {--with-bootstrap : Add this option if you want the views to be generated with Bootstrap support}
+        {--css-style=plain : The CSS style to apply. Available options: plain, bootstrap, tailwind}
+        {--with-auth : Include authentication support in the generated code.}
         {--no-copyright : If set, generated files will omit the copyright header}
         {--cleanup : Remove all .bak files from the folders and exit}
         {--purge : Remove all generated file for given migration}';
@@ -97,14 +98,16 @@ class SkeletonsGenerator extends Command
             return;
         }
 
-        $withBootStrap = $this->option('with-bootstrap');
-
         // Retrieve the migration file path using a glob pattern.
         $migrationFilePath = glob(AbstractGenerator::getPath(database_path("migrations/*_$migrationName.php")));
         if (empty($migrationFilePath)) {
             $this->error("❗Migration file '$migrationName' not found.");
             return;
         }
+
+        $cssStyle = $this->getCssStyle();
+
+        $withAuth = $this->option('with-auth');
 
         // Process the migration file to build a collection of entities.
         $entities = MigrationParser::processMigrationFile($migrationFilePath[0]);
@@ -118,7 +121,7 @@ class SkeletonsGenerator extends Command
                 }
                 $this->info("✅ Skeletons lang files copied.");
             }
-            
+
             // Phase 1: Generate Models and Update related models.
             $this->processPhase(ModelGenerator::class, $entities);
             $this->processPhase(ModelGenerator::class, $entities, [], 'updateRelatedModels');
@@ -130,16 +133,16 @@ class SkeletonsGenerator extends Command
             $this->processPhase(ControllerGenerator::class, $entities);
 
             // Phase 4: Generate Views (pass extra parameter for bootstrap support).
-            $this->processPhase(ViewGenerator::class, $entities, [$withBootStrap]);
+            $this->processPhase(ViewGenerator::class, $entities, [$cssStyle, $withAuth]);
 
             // Phase 5: Generate Routes.
-            $this->processPhase(RouteGenerator::class, $entities);
+            $this->processPhase(RouteGenerator::class, $entities, [$withAuth]);
 
             // Phase 6: Generate Language Files.
             $this->processPhase(TranslationsGenerator::class, $entities);
 
             // Phase 7: Generate Menus.
-            $this->processPhase(MenuGenerator::class, $entities, [$withBootStrap]);
+            $this->processPhase(MenuGenerator::class, $entities, [$cssStyle]);
 
             // Phase 8: Generate Seeders
             $this->processPhase(SeederGenerator::class, $entities);
@@ -396,5 +399,12 @@ class SkeletonsGenerator extends Command
         }
     }
 
-
+    private function getCssStyle()
+    {
+        $cssStyle = trim($this->option('css-style'));
+        if (empty($cssStyle)) {
+            return '';
+        }
+        return $cssStyle;
+    }
 }

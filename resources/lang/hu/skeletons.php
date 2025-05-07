@@ -22,5 +22,6 @@ return [
     'search' => 'Keres',
     'show' => 'Mutat',
     'select' => '-- Válassz --',
-    'all_rights_reserved' => 'Minden jog fenntartva.'
+    'all_rights_reserved' => 'Minden jog fenntartva.',
+    'search_column_missing' => 'The search column ":column" does not exist in the table.',
 ];

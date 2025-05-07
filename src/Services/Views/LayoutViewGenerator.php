@@ -14,8 +14,8 @@ class LayoutViewGenerator extends BaseViewGenerator
         // Define paths
         $layoutsPath = $this->getPath(resource_path("views/layouts"));
         $stubsPath = self::stub_path("views/layouts");
-        if ($this->withBootStrap) {
-            $stubsPath = self::stub_path("views/layouts/bootstrap");
+        if ($this->cssStyle) {
+            $stubsPath = self::stub_path("views/layouts/{$this->cssStyle}");
         }
 
         // Ensure the layouts directory exists
@@ -28,10 +28,19 @@ class LayoutViewGenerator extends BaseViewGenerator
             // Get the destination file path
             $fileName = basename($stubFile); // Extract file name from path
             $destinationFile = $layoutsPath . DIRECTORY_SEPARATOR . str_replace("stub", "blade.php", $fileName);
-
+            $content = '';
+            if ($fileName === 'app.stub') {
+                $stubContent = self::getStubContent($stubFile);
+                $placeholders = [];
+                $content = $this->replacePlaceholders($stubContent, $placeholders);
+            }
             // Check if the destination file already exists
             if (!File::exists($destinationFile)) {
-                File::copy($stubFile, $destinationFile); // Copy the stub file to the destination
+                if ($content) {
+                    File::put($destinationFile, $content);
+                } else {
+                    File::copy($stubFile, $destinationFile);
+                }
                 $this->generatedFiles[] = $destinationFile; // Track the generated file
                 $this->command->info("✅ Layout created: {$destinationFile}");
             }

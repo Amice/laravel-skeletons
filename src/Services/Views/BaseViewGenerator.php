@@ -7,13 +7,14 @@ use Illuminate\Support\Str;
 
 abstract class BaseViewGenerator extends AbstractGenerator
 {
-    protected bool $withBootStrap;
+    protected string $cssStyle;
 
-    public function __construct($command, array $parsedData, $withBootStrap = false)
+    public function __construct($command, array $parsedData, $cssStyle = '')
     {
         parent::__construct($command, $parsedData);
-        $this->withBootStrap = $withBootStrap;
+        $this->cssStyle = $cssStyle;
     }
+
     abstract public function generate(): ?array;
 
     protected function getInputType(string $type): string
@@ -26,6 +27,11 @@ abstract class BaseViewGenerator extends AbstractGenerator
             return 'date';
         }
         return 'text'; // Default input type
+    }
+
+    protected function getStubFilePath(string $stubFileName): string
+    {
+        return $this->cssStyle ? self::stub_path("views/{$this->cssStyle}/$stubFileName") : self::stub_path("views/$stubFileName");
     }
 
 }

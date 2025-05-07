@@ -1,0 +1,31 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="container mx-auto px-4 py-6">
+    <!-- Page Title -->
+    <h1 class="text-2xl font-semibold mb-4">
+        {{ __('skeletons.modifying', ['model' => __('{{ table_name }}.{{ singular }}')]) }}
+    </h1>
+
+    <!-- Error Message -->
+    @include('layouts.errors')
+
+    <!-- Form -->
+    <form action="{{ route('{{ table_name }}.update', ${{ singular }}) }}" method="POST" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        @csrf
+        @method('PUT')
+        {{ form_fields }}
+
+        <div class="flex items-center justify-between mt-4">
+            <!-- Save Button -->
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                {{ __('skeletons.save') }}
+            </button>
+            <!-- Cancel Button -->
+            <a href="{{ route('{{ table_name }}.index') }}" class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
+                {{ __('skeletons.cancel') }}
+            </a>
+        </div>
+    </form>
+</div>
+@endsection

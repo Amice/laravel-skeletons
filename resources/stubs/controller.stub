@@ -1,5 +1,5 @@
 <?php
-
+{{ copyrightHeader }}
 namespace App\Http\Controllers;
 
 {{ useStatements }}
@@ -67,7 +67,7 @@ class {{ className }} extends Controller
 
         ${{ singular }}->update($request->validated());
 
-        return redirect()->route('{{ plural }}.index')
+        return redirect()->route('{{ table_name }}.index')
             ->with('success', __('skeletons.updated_successfully', ['model' => '{{ model }}']));
     }
 
@@ -82,7 +82,7 @@ class {{ className }} extends Controller
             ${{ singular }}->delete();
         }
 
-        return redirect()->route('{{ plural }}.index')
+        return redirect()->route('{{ table_name }}.index')
             ->with('success', __('skeletons.deleted_successfully', ['model' => '{{ model }}']));
     }
 
@@ -92,8 +92,26 @@ class {{ className }} extends Controller
     public function search(Request $request)
     {
         $needle = $request->get('needle');
-        ${{ plural }} = {{ model }}::orderBy('name')->where('name', 'like', "%{$needle}%")->paginate(config('app.pagination_limit', 20));
+        $searchColumn = 'name'; 
 
-        return view('{{ plural }}.index', compact('{{ plural }}'));
+        try {
+            ${{ plural }} = {{ model }}::orderBy($searchColumn)
+                ->where($searchColumn, 'like', "%{$needle}%")
+                ->paginate(config('app.pagination_limit', 20));
+
+            return view('{{ table_name }}.index', compact('{{ plural }}'));
+
+        } catch (\Illuminate\Database\QueryException $e) {
+            if (strpos(strtolower($e->getMessage()), 'unknown column') !== false) {
+                $errors = \Illuminate\Support\Facades\Validator::make([], [])
+                    ->errors();
+                $errors->add('search_error', __('skeletons.search_column_missing', ['column' => $searchColumn]));
+
+                return redirect()->back()->withErrors($errors)->withInput();
+            }
+
+            // Handle other potential database errors if needed
+            throw $e;
+        }
     }
 }

@@ -11,7 +11,7 @@ class ShowViewGenerator extends BaseViewGenerator
     public function generate(): ?array
     {
         $stubFileName = 'show.stub';
-        $stubFilePath = $this->withBootStrap ? self::stub_path("views/bootstrap/$stubFileName") : self::stub_path("views/$stubFileName");
+        $stubFilePath = $this->getStubFilePath($stubFileName);
         try {
             $stubContent = self::getStubContent($stubFilePath);
         }

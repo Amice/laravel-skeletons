@@ -17,14 +17,14 @@ class ViewGenerator extends BaseViewGenerator
     private ShowViewGenerator $showViewGenerator;
     private LayoutViewGenerator $layoutViewGenerator;
 
-    public function __construct($command, $parsedData, $withBootstrap, )
+    public function __construct($command, $parsedData, $cssStyle, $withAuth = false)
     {
-        parent::__construct($command, $parsedData, $withBootstrap);
-        $this->indexViewGenerator = new IndexViewGenerator($command, $parsedData, $withBootstrap);
-        $this->createViewGenerator = new CreateViewGenerator($command, $parsedData, $withBootstrap);
-        $this->editViewGenerator = new EditViewGenerator($command, $parsedData, $withBootstrap);
-        $this->showViewGenerator = new ShowViewGenerator($command, $parsedData, $withBootstrap);
-        $this->layoutViewGenerator = new LayoutViewGenerator($command, $parsedData, $withBootstrap);
+        parent::__construct($command, $parsedData, $cssStyle);
+        $this->indexViewGenerator = new IndexViewGenerator($command, $parsedData, $cssStyle, $withAuth);
+        $this->createViewGenerator = new CreateViewGenerator($command, $parsedData, $cssStyle);
+        $this->editViewGenerator = new EditViewGenerator($command, $parsedData, $cssStyle);
+        $this->showViewGenerator = new ShowViewGenerator($command, $parsedData, $cssStyle);
+        $this->layoutViewGenerator = new LayoutViewGenerator($command, $parsedData, $cssStyle);
     }
 
     public function generate(): ?array

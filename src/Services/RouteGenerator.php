@@ -8,12 +8,17 @@ use Illuminate\Support\Str;
 class RouteGenerator extends AbstractGenerator
 {
 
+    private bool $withAuth = false;
+
+    public function __construct($command, array $parsedData, $withAuth = false)
+    {
+        parent::__construct($command, $parsedData);
+        $this->withAuth = $withAuth;
+    }
+
     public function generate(): ?array
     {
-        // Determine if auth middleware is available
-        $hasAuthMiddleware = in_array('auth', array_keys(app('router')->getMiddleware()));
-
-        $stubFileName = $hasAuthMiddleware ? self::stub_path('routes_auth.stub') : self::stub_path('routes.stub');
+        $stubFileName = $this->withAuth ? self::stub_path('routes_auth.stub') : self::stub_path('routes.stub');
         try {
             $stubContent = self::getStubContent($stubFileName);
         }

@@ -22,9 +22,7 @@ class MenuGenerator extends BaseViewGenerator
         $content = File::get($filePath);
 
         // Prepare the menu item code snippet
-        $menuItem = $this->withBootStrap
-            ? "<li class='nav-item'><a class='nav-link' href=\"{{ route('{$routeName}.index') }}\">{{ __('{$routeName}.{$routeName}') }}</a></li>"
-            : "<li><a href=\"{{ route('{$routeName}.index') }}\">{{ __('{$routeName}.{$routeName}') }}</a></li>";
+        $menuItem = $this->getMenuItem();
         $this->addedItems[] = $menuItem;
 
         // Check if the menu item already exists
@@ -76,5 +74,18 @@ class MenuGenerator extends BaseViewGenerator
                 $this->command->warn("❗Menu item for {$modelName} not found in nav.blade.php. Rollback skipped.");
             }
         }
+    }
+
+    private function getMenuItem(): string
+    {
+        $routeName = $this->tableName;
+        if ($this->cssStyle === "tailwind") {
+            return "<li class='inline-block px-2'><a class='text-blue-500 hover:underline' href=\"{{ route('{$routeName}.index') }}\">{{ __('{$routeName}.{$routeName}') }}</a></li>";
+        }
+        if ($this->cssStyle === "bootstrap") {
+            return "<li class='nav-item'><a class='nav-link' href=\"{{ route('{$routeName}.index') }}\">{{ __('{$routeName}.{$routeName}') }}</a></li>";
+        }
+        
+        return "<li><a href=\"{{ route('{$routeName}.index') }}\">{{ __('{$routeName}.{$routeName}') }}</a></li>";
     }
 }

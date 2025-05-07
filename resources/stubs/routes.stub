@@ -1,5 +1,5 @@
 <?php
-
+{{ copyrightHeader }}
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{{ controller }};
 
