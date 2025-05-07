@@ -45,7 +45,7 @@ class SkeletonsGenerator extends Command
         {--with-auth : Include authentication support in the generated code.}
         {--no-copyright : If set, generated files will omit the copyright header}
         {--cleanup : Remove all .bak files from the folders and exit}
-        {--purge : Remove all generated file for given migration}';
+        {--purge : Remove all generated files for the given migration}';
 
     /**
      * The console command description.
