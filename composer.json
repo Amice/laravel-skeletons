@@ -1,8 +1,19 @@
 {
     "name": "kovacs-laci/laravel-skeletons",
     "description": "An artisan command to make skeletons with content for a Laravel application.",
-    "version": "1.1.9",
-    "keywords": ["laravel", "package", "skeletons", "generator"],
+    "version": "1.1.10",
+    "keywords": [
+        "laravel",
+        "composer",
+        "package",
+        "skeletons",
+        "code generation",
+        "migration",
+        "scaffolding",
+        "api generator",
+        "crud generator",
+        "laravel command"
+    ],
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -41,4 +52,3 @@
         }
     }
 }
-
