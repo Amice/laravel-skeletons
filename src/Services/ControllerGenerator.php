@@ -33,9 +33,10 @@ class ControllerGenerator extends AbstractGenerator
      * @return null
      * @throws \Exception If any issues occur that require halting the process.
      */
+
     public function generate(): ?array
     {
-        $stubFileName = self::stub_path('controller.stub');
+        $stubFileName = $this->isApi ? self::stub_path('api/controller.stub') :  self::stub_path('controller.stub');
         try {
             $stubContent = self::getStubContent($stubFileName);
         }
@@ -87,8 +88,11 @@ class ControllerGenerator extends AbstractGenerator
             '{{ relatedCompactEdit }}' => $relatedCompactEdit,
         ];
         $content = $this->replacePlaceholders($stubContent, $placeholders);
-        $filePath = $this->getPath(app_path("Http/Controllers/$className.php"));
+        $filePath = $this->isApi
+            ? $this->getPath(app_path("Http/Controllers/Api/$className.php"))
+            : $this->getPath(app_path("Http/Controllers/$className.php"));
         $this->createBackup($filePath);
+        File::ensureDirectoryExists(dirname($filePath));
         File::put($filePath, $content);
         $this->generatedFiles[] = $filePath;
         $this->command->info("✅ Controller created: {$filePath}");

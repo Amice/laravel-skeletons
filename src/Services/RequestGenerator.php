@@ -60,8 +60,10 @@ class RequestGenerator extends AbstractGenerator
 
         $this->command->info("✅ Request created: {$filePath}");
 
-        // Update the language file for validation messages.
-        $this->updateValidationLanguageFiles();
+        if (!$this->isApi) {
+            // Update the language file for validation messages.
+            $this->updateValidationLanguageFiles();
+        }
 
         return [
             'generated_files' => $this->generatedFiles,

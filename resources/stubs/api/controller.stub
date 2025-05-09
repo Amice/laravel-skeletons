@@ -1,0 +1,142 @@
+<?php
+{{ copyrightHeader }}
+namespace App\Http\Controllers\Api;
+
+{{ useStatements }}
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+
+class {{ className }} extends Controller
+{
+    /**
+     * Display a listing of the resource with pagination.
+     */
+    public function index(): JsonResponse
+    {
+        try {
+            ${{ plural }} = {{ model }}::paginate(config('app.pagination_limit', 20));
+
+            return response()->json([
+                'data' => ${{ plural }}->items(),
+                'pagination' => [
+                    'current_page' => ${{ plural }}->currentPage(),
+                    'last_page' => ${{ plural }}->lastPage(),
+                    'per_page' => ${{ plural }}->perPage(),
+                    'total' => ${{ plural }}->total(),
+                ],
+            ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            \Log::error("Error fetching {{ plural }}: " . $e->getMessage());
+            return response()->json(['message' => __('skeletons.fetch_failed', ['model' => Str::plural('{{ model }}')]), 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        } catch (\Exception $e) {
+            \Log::error("Unexpected error in fetching {{ plural }}: " . $e->getMessage());
+            return response()->json(['message' => __('skeletons.unexpected_error'), 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Store a newly created resource in storage using validated request data.
+     */
+    public function store({{ model }}Request $request): JsonResponse
+    {
+        $validatedData = $request->validated();
+
+        try {
+            ${{ singular }} = {{ model }}::create($validatedData);
+            return response()->json([
+                'data' => ${{ singular }},
+                'message' => __('skeletons.created_successfully', ['model' => '{{ model }}']),
+            ], Response::HTTP_CREATED);
+        } catch (\Exception $e) {
+            \Log::error("Error creating {{ singular }}: " . $e->getMessage());
+            return response()->json(['message' => __('skeletons.create_failed', ['model' => '{{ model }}']), 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id): JsonResponse
+    {
+        try {
+            ${{ singular }} = {{ model }}::findOrFail($id);
+            return response()->json(['data' => ${{ singular }}]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => __('skeletons.model_not_found', ['model' => '{{ model }}'])], Response::HTTP_NOT_FOUND);
+        }
+    }
+
+    /**
+     * Update the specified resource in storage using validated request data.
+     */
+    public function update({{ model }}Request $request, string $id): JsonResponse
+    {
+        ${{ singular }} = {{ model }}::findOrFail($id);
+        $validatedData = $request->validated();
+
+        try {
+            ${{ singular }}->update($validatedData);
+            return response()->json([
+                'data' => ${{ singular }},
+                'message' => __('skeletons.updated_successfully', ['model' => '{{ model }}']),
+            ]);
+        } catch (\Exception $e) {
+            \Log::error("Error updating {{ singular }} {$id}: " . $e->getMessage());
+            return response()->json(['message' => __('skeletons.update_failed', ['model' => '{{ model }}']), 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id): JsonResponse
+    {
+        ${{ singular }} = {{ model }}::find($id);
+
+        if (${{ singular }}) {
+            try {
+                ${{ singular }}->delete();
+                return response()->json(['message' => __('skeletons.deleted_successfully', ['model' => '{{ model }}'])]);
+            } catch (\Exception $e) {
+                \Log::error("Error deleting {{ singular }} {$id}: " . $e->getMessage());
+                return response()->json(['message' => __('skeletons.delete_failed', ['model' => '{{ model }}']), 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        return response()->json(['message' => __('skeletons.model_not_found', ['model' => '{{ model }}'])], Response::HTTP_NOT_FOUND);
+    }
+
+    /**
+     * Search for resources based on provided needle input.
+     */
+    public function search(Request $request): JsonResponse
+    {
+        $needle = $request->get('needle');
+        $searchColumn = 'name'; // Consider making this configurable
+
+        try {
+            ${{ plural }} = {{ model }}::orderBy($searchColumn)
+                ->where($searchColumn, 'like', "%{$needle}%")
+                ->paginate(config('app.pagination_limit', 20));
+
+            return response()->json([
+                'data' => ${{ plural }}->items(),
+                'pagination' => [
+                    'current_page' => ${{ plural }}->currentPage(),
+                    'last_page' => ${{ plural }}->lastPage(),
+                    'per_page' => ${{ plural }}->perPage(),
+                    'total' => ${{ plural }}->total(),
+                ],
+            ]);
+
+        } catch (\Illuminate\Database\QueryException $e) {
+            if (strpos(strtolower($e->getMessage()), 'unknown column') !== false) {
+                return response()->json(['message' => __('skeletons.search_column_missing', ['column' => $searchColumn])], Response::HTTP_BAD_REQUEST);
+            }
+
+            \Log::error("Error during search for {{ plural }}: " . $e->getMessage());
+            return response()->json(['message' => __('skeletons.search_failed'), 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+}

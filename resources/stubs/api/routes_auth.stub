@@ -1,0 +1,21 @@
+<?php
+{{ copyrightHeader }}
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\{{ controller }}; // Point to the API controller
+
+// API Routes for {{ model }}
+
+Route::prefix('{{ table_name }}')->group(function () {
+    // Publicly accessible routes
+    Route::get('/', [{{ controller }}::class, 'index'])->name('{{ table_name }}.index');
+    Route::get('/{id}', [{{ controller }}::class, 'show'])->name('{{ table_name }}.show');
+    Route::get('/search', [{{ controller }}::class, 'search'])->name('{{ table_name }}.search');
+
+    // Authenticated routes
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/', [{{ controller }}::class, 'store'])->name('{{ table_name }}.store');
+        Route::put('/{id}', [{{ controller }}::class, 'update'])->name('{{ table_name }}.update');
+        Route::delete('/{id}', [{{ controller }}::class, 'destroy'])->name('{{ table_name }}.destroy');
+    });
+});

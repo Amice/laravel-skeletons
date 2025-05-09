@@ -25,4 +25,12 @@ return [
     'select' => '-- Select --',
     'all_rights_reserved' => 'All rights reserved.',
     'search_column_missing' => 'The search column ":column" does not exist in the table.',
+    'create_failed' => 'Failed to create :model.',
+    'update_failed' => 'Failed to update :model.',
+    'delete_failed' => 'Failed to delete :model.',
+    'created_successfully' => ':model created successfully.',
+    'updated_successfully' => ':model updated successfully.',
+    'deleted_successfully' => ':model deleted successfully.',
+    'model_not_found' => ':model not found.',
+    'search_failed' => 'Search failed.',
 ];

@@ -41,11 +41,12 @@ class SkeletonsGenerator extends Command
      */
     protected $signature = 'app:make-skeletons
         {--migration= : The migration file to be used, e.g. create_products_table}
+        {--api : Generetes code for RESTful API}
         {--css-style=plain : The CSS style to apply. Available options: plain, bootstrap, tailwind}
         {--with-auth : Include authentication support in the generated code.}
         {--no-copyright : If set, generated files will omit the copyright header}
         {--cleanup : Remove all .bak files from the folders and exit}
-        {--purge : Remove all generated files for the given migration}';
+        {--purge : Remove all generated file for given migration}';
 
     /**
      * The console command description.
@@ -80,6 +81,9 @@ class SkeletonsGenerator extends Command
      */
     public function handle(): void
     {
+        $withAuth = $this->option('with-auth');
+        $api  = $this->option('api');
+
         // Clean-up mode: remove all .bak files and exit.
         if ($this->option('cleanup')) {
             $this->cleanupBakFiles();
@@ -107,8 +111,6 @@ class SkeletonsGenerator extends Command
 
         $cssStyle = $this->getCssStyle();
 
-        $withAuth = $this->option('with-auth');
-
         // Process the migration file to build a collection of entities.
         $entities = MigrationParser::processMigrationFile($migrationFilePath[0]);
 
@@ -125,25 +127,21 @@ class SkeletonsGenerator extends Command
             // Phase 1: Generate Models and Update related models.
             $this->processPhase(ModelGenerator::class, $entities);
             $this->processPhase(ModelGenerator::class, $entities, [], 'updateRelatedModels');
-
             // Phase 2: Generate Requests.
-            $this->processPhase(RequestGenerator::class, $entities);
-
+            $this->processPhase(RequestGenerator::class, $entities, [$api]);
             // Phase 3: Generate Controllers.
-            $this->processPhase(ControllerGenerator::class, $entities);
-
-            // Phase 4: Generate Views (pass extra parameter for bootstrap support).
-            $this->processPhase(ViewGenerator::class, $entities, [$cssStyle, $withAuth]);
-
+            $this->processPhase(ControllerGenerator::class, $entities, [$api]);
             // Phase 5: Generate Routes.
-            $this->processPhase(RouteGenerator::class, $entities, [$withAuth]);
+            $this->processPhase(RouteGenerator::class, $entities, [$api, $withAuth]);
 
-            // Phase 6: Generate Language Files.
-            $this->processPhase(TranslationsGenerator::class, $entities);
-
-            // Phase 7: Generate Menus.
-            $this->processPhase(MenuGenerator::class, $entities, [$cssStyle]);
-
+            if (!$api) {
+                // Phase 4: Generate Views (pass extra parameter for bootstrap support).
+                $this->processPhase(ViewGenerator::class, $entities, [$cssStyle, $withAuth]);
+                // Phase 6: Generate Language Files.
+                $this->processPhase(TranslationsGenerator::class, $entities);
+                // Phase 7: Generate Menus.
+                $this->processPhase(MenuGenerator::class, $entities, [$cssStyle]);
+            }
             // Phase 8: Generate Seeders
             $this->processPhase(SeederGenerator::class, $entities);
         } catch (Exception $e) {
@@ -288,13 +286,14 @@ class SkeletonsGenerator extends Command
 
         $message = "No generation log found for migration: $migrationName";
         if (File::exists($logFile)) {
-            $filesLog = json_decode(File::get($logFile), true);
+            $logData = json_decode(File::get($logFile), true);
+            $apiOptionUsed = $logData['options']['api'] ?? false; // Default to false if option not found
 
             // Delete generated files.
-            if (!empty($filesLog['generated_files'])) {
-                foreach ($filesLog['generated_files'] as $file) {
+            if (!empty($logData['generated_files'])) {
+                foreach ($logData['generated_files'] as $file) {
                     if (Str::contains($file, 'routes')) {
-                        RouteGenerator::removeRequireFromWebRoutes($file);
+                        RouteGenerator::removeRequireFromRoutes($file, $apiOptionUsed);
                     }
                     if (File::exists($file)) {
                         File::delete($file);
@@ -303,8 +302,8 @@ class SkeletonsGenerator extends Command
                 }
             }
             // Delete backup files.
-            if (!empty($filesLog['backup_files'])) {
-                foreach ($filesLog['backup_files'] as $original => $backup) {
+            if (!empty($logData['backup_files'])) {
+                foreach ($logData['backup_files'] as $original => $backup) {
                     if (File::exists($backup)) {
                         File::delete($backup);
                         $this->info("Deleted backup file: {$backup}");
@@ -312,7 +311,7 @@ class SkeletonsGenerator extends Command
                 }
             }
             // Delete menu items.
-            $this->removeMenuItems($filesLog['menu_items']);
+            $this->removeMenuItems($logData['menu_items']);
             // Remove the log file after purge.
             File::delete($logFile);
             $message = "Removed log file: $logFile";
@@ -343,6 +342,13 @@ class SkeletonsGenerator extends Command
         $newLogData = $this->allGeneratedFiles;
         $finalLogData = $newLogData;
 
+        // Add the command options to the new log data
+        $newLogData['options'] = [
+            'api' => $this->option('api'),
+            'with-auth' => $this->option('with-auth'),
+            // Add other relevant options if needed
+        ];
+
         // If the log file exists, merge its data with the new one.
         if (File::exists($logFile)) {
             $existing = json_decode(File::get($logFile), true);
@@ -350,23 +356,28 @@ class SkeletonsGenerator extends Command
                 $existing = [
                     'generated_files' => [],
                     'backup_files'    => [],
+                    'options' => [], // Initialize options if not present
                 ];
             }
 
-            // Merge and remove duplicates.
+            // Merge generated and backup files and remove duplicates.
             $mergedGeneratedFiles = array_merge($existing['generated_files'], $newLogData['generated_files']);
             $mergedBackupFiles    = array_merge($existing['backup_files'], $newLogData['backup_files']);
 
-            // Ensure the arrays contain unique entries.
             $existing['generated_files'] = array_values(array_unique($mergedGeneratedFiles));
             $existing['backup_files']    = array_values(array_unique($mergedBackupFiles));
 
+            // Keep the options from the latest generation
+            $existing['options'] = $newLogData['options'];
+
             $finalLogData = $existing;
+        } else {
+            $finalLogData['options'] = $newLogData['options'];
         }
 
         // Save the merged log back to the file.
         File::ensureDirectoryExists(File::dirname($logFile));
-        File::put($logFile, json_encode($finalLogData));
+        File::put($logFile, json_encode($finalLogData, JSON_PRETTY_PRINT));
         $this->info("Generation log updated: {$logFile}");
     }
 

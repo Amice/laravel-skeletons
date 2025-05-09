@@ -22,6 +22,7 @@ abstract class AbstractGenerator
     protected $modelName;     // Model name
     protected $singular;
     protected $plural;
+    protected $isApi = false;
     protected $generatedFiles = []; // Track generated files
     protected $backupFiles = [];    // Track backup files
     protected $copyrightHeader = <<<HEADER
@@ -32,7 +33,7 @@ abstract class AbstractGenerator
  */
 HEADER;
 
-    public function __construct($command, array $parsedData)
+    public function __construct($command, array $parsedData, $isApi = false)
     {
         $this->command = $command;
         $this->parsedData = $parsedData;
@@ -42,6 +43,7 @@ HEADER;
         $this->modelName = $this->getModelName($this->tableName);
         $this->singular = Str::camel($this->modelName);
         $this->plural = Str::camel($this->tableName);
+        $this->isApi = $isApi;
 
         $this->copyrightHeader = $this->command->option('no-copyright') ? '' : $this->copyrightHeader;
     }
