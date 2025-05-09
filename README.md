@@ -2,6 +2,12 @@
 ---
 ### Laravel Skeletons Generator Command
 
+[![Latest Version on Packagist](...)](https://packagist.org/packages/kovacs-laci/laravel-skeletonse)
+[![GitHub Stars](...)](https://github.com/Amice/laravel-skeletons.git)
+
+**Repository:** [https://github.com/Amice/laravel-skeletons.git](https://github.com/Amice/laravel-skeletons.git)
+
+
 The `app:make-skeletons` command is a comprehensive migration-driven code-generation tool for Laravel applications. It automates the creation of your app’s core scaffolding with the following key features:
 
 - **Migration Parsing and Related Entities Discovery:**  
@@ -49,7 +55,7 @@ The `app:make-skeletons` command is a comprehensive migration-driven code-genera
 	 });
 	 Route::get('/examples/{example}', [ExampleController::class, 'show'])->name('examples.show');
 	```
-	All generated route files are automatically required in your main web.php file, so your routes are seamlessly integrated into the application.
+	All generated route files are automatically required in your main web.php / api.php file, so your routes are seamlessly integrated into the application.
 	
 - **Language Files Generation and Copy:**  
   The command generates a separate language file for each model. The file name is derived directly from the table name. These generated language files are then copied recursively into your project’s `resources/lang` folder, preserving any subdirectory structure for different locales.  
@@ -103,12 +109,10 @@ By automating these repetitive tasks, intelligently discovering table relationsh
    *Note:* The migration timestamp can be omitted.
 
    **Optional Flags:**
-   - `--migration=` : The migration file to be used, e.g. create_products_table.
-   - `--css-style=plain` : The CSS style to apply. Available options: plain, bootstrap, tailwind.
-   - `--with-auth` : Include authentication support in the generated code.
-   - `--no-copyright` : If set, generated files will omit the copyright header.
-   - `--cleanup` : Remove all `.bak` files from the folders and exit.
-   - `--purge` : Remove all generated files for the given migration except `.bak` files.
+   - `--with-bootstrap`: Generates views with Bootstrap styling.
+   - `--purge`: Deletes all generated files for the specified migration.
+   - `--cleanup`: Deletes all backup (`.bak`) files.
+   - `--no-copyright`: Omits the copyright header from generated PHP files.
 
 **Final Note:**  
 After following these steps, you’ll have your application’s language, pagination, and code scaffolding set up as intended. 
