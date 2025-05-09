@@ -55,16 +55,18 @@ The `app:make-skeletons` command is a comprehensive migration-driven code-genera
 	 });
 	 Route::get('/examples/{example}', [ExampleController::class, 'show'])->name('examples.show');
 	```
-	All generated route files are automatically required in your main web.php / api.php file, so your routes are seamlessly integrated into the application.
+All generated route files are automatically required in your main web.php / api.php file, so your routes are seamlessly integrated into the application.
 	
 - **Language Files Generation and Copy:**  
   The command generates a separate language file for each model. The file name is derived directly from the table name. These generated language files are then copied recursively into your project’s `resources/lang` folder, preserving any subdirectory structure for different locales.  
   
 - **Customization Options:**  
   Users can tailor the generation process with a variety of command-line options, such as:
-   - Selecting which CSS framework to use (Bootstrap or Tailwind).
-   - Controlling whether a copyright header is included in generated files.
-   - Adjusting batch sizes for seeder file insertion when dealing with large datasets.
+    - `--with-bootstrap`: Generates views with Bootstrap styling.
+    - `--purge`: Deletes all generated files for the specified migration.
+    - `--cleanup`: Deletes all backup (`.bak`) files.
+    - `--no-copyright`: Omits the copyright header from generated PHP files.
+    - `--api`: Generates API-specific controllers and routes, placing controllers in the `app/Http/Controllers/Api` directory and requiring the generated route file in `routes/api.php`. This option is ideal for building API backends.
 
 By automating these repetitive tasks, intelligently discovering table relationships, managing data, route, and translation files seamlessly, and enforcing naming conventions, the `app:make-skeletons` command can significantly speed up your development process—allowing you to focus on building application-specific features rather than boilerplate code.
 
@@ -113,6 +115,7 @@ By automating these repetitive tasks, intelligently discovering table relationsh
    - `--purge`: Deletes all generated files for the specified migration.
    - `--cleanup`: Deletes all backup (`.bak`) files.
    - `--no-copyright`: Omits the copyright header from generated PHP files.
+   - `--api` : Generates API-specific controllers (located in app/Http/Controllers/Api), requests, and routes (required in routes/api.php). This is useful for building backend APIs.
 
 **Final Note:**  
 After following these steps, you’ll have your application’s language, pagination, and code scaffolding set up as intended. 
