@@ -32,7 +32,12 @@ class RouteGenerator extends AbstractGenerator
             '{{ controller }}' => $controller,
         ];
         $content = $this->replacePlaceholders($stubContent, $placeholders);
-        $filePath = self::getPath(base_path("routes/{$this->tableName}.php"));
+        $destFileName = "routes/web/{$this->tableName}.php";
+        if ($this->isApi) {
+            $destFileName = "routes/api/{$this->tableName}.php";
+        }
+        $filePath = self::getPath(base_path($destFileName));
+        File::ensureDirectoryExists(dirname($filePath));
         $this->createBackup($filePath);
         File::put($filePath, $content);
         $this->generatedFiles[] = $filePath;
@@ -52,17 +57,17 @@ class RouteGenerator extends AbstractGenerator
         $routesFileName = $this->isApi ? "api.php" : "web.php";
         $routesFilePath = self::getPath(base_path("routes/$routesFileName"));
         if (!File::exists($routesFilePath)) {
-            $this->error("❗The routes/$routesFileName file is missing. This is required when generating routes.");
-            $this->line('💡 Please ensure this file exists in your routes directory.');
+            $this->command->error("❗The routes/$routesFileName file is missing. This is required when generating routes.");
+            $this->command->line('💡 Please ensure this file exists in your routes directory.');
             if ($this->isApi) {
-                $this->line('   You might need to create it manually or ensure your Laravel installation supports API routing.');
-                $this->line('   You might run the following command: <fg=yellow>php artisan install:api</>');
-                $this->line('   Alternatively, ensure your Laravel installation includes API routing setup (e.g., by using the Laravel Breeze or Jetstream with API option during installation).');
+                $this->command->line('   You might need to create it manually or ensure your Laravel installation supports API routing.');
+                $this->command->line('   You might run the following command: <fg=yellow>php artisan install:api</>');
+                $this->lcommand->ine('   Alternatively, ensure your Laravel installation includes API routing setup (e.g., by using the Laravel Breeze or Jetstream with API option during installation).');
             } else {
-                $this->line('   A basic web.php file should exist by default in a standard Laravel installation.');
+                $this->command->line('   A basic web.php file should exist by default in a standard Laravel installation.');
             }
-            $this->warn("❗ Skipping route inclusion in $routesFileName.");
-            $this->error('❌ Aborting the process.');
+            $this->command->warn("❗ Skipping route inclusion in $routesFileName.");
+            $this->command->error('❌ Aborting the process.');
             return false;
         }
         // Read the existing web.php content
@@ -81,7 +86,7 @@ class RouteGenerator extends AbstractGenerator
         // Write the updated content back to web.php
         File::put($routesFilePath, $webContent);
         $this->command->info("$routesFileName updated with route file imports.");
-        
+
         return true;
     }
 

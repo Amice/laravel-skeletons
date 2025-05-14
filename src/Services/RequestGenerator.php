@@ -54,6 +54,7 @@ class RequestGenerator extends AbstractGenerator
         ];
         $content = $this->replacePlaceholders($stubContent, $placeholders);
         $filePath = self::getPath(app_path("Http/Requests/{$className}.php"));
+        File::ensureDirectoryExists(File::dirname($filePath), true);
         $this->createBackup($filePath);
         File::put($filePath, $content);
         $this->generatedFiles[] = $filePath;
