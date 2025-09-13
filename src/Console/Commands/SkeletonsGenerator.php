@@ -717,8 +717,9 @@ class SkeletonsGenerator extends Command
     {
         $cssStyle = trim($this->option('css-style'));
         if (empty($cssStyle)) {
-            return '';
+            return 'plain';
         }
+
         return $cssStyle;
     }
 }

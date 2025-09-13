@@ -2,6 +2,7 @@
 
 namespace KovacsLaci\LaravelSkeletons\Services\Views;
 
+use KovacsLaci\LaravelSkeletons\Console\Commands\SkeletonsGenerator;
 use KovacsLaci\LaravelSkeletons\Services\AbstractGenerator;
 use Illuminate\Support\Str;
 
@@ -12,6 +13,9 @@ abstract class BaseViewGenerator extends AbstractGenerator
     public function __construct($command, array $parsedData, $cssStyle = '')
     {
         parent::__construct($command, $parsedData);
+        if (empty($cssStyle)) {
+            $cssStyle = 'plain';
+        }
         $this->cssStyle = $cssStyle;
     }
 
