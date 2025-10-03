@@ -41,7 +41,7 @@ class SkeletonsGenerator extends Command
      */
     protected $signature = 'app:make-skeletons
         {--migration= : The migration file to be used, e.g. create_products_table}
-        {--api : Generetes code for RESTful API}
+        {--api : Generates code for REST API}
         {--css-style=plain : The CSS style to apply. Available options: plain, bootstrap, tailwind}
         {--with-auth : Include authentication support in the generated code.}
         {--no-copyright : If set, generated files will omit the copyright header}

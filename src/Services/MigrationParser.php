@@ -97,61 +97,30 @@ class MigrationParser
     public static function extractColumns(string $content): array
     {
         $relationships = self::extractRelationships($content);
-        // Break the content into individual lines.
         $lines = Str::of($content)->explode("\n");
 
         $columns = [];
         foreach ($lines as $line) {
-            $line = Str::of($line)->trim(); // Remove outer whitespace
+            $line = Str::of($line)->trim();
 
-            // Only process lines that begin with "$table->"
-            if (!Str::startsWith($line, '$table->')) {
+            if (!self::isParsableColumnLine($line)) {
                 continue;
             }
 
-            // Extract the method (i.e. the function name called on $table)
-            $method = Str::before(Str::after($line, '$table->'), '(');
+            $method = self::extractMethodName($line);
 
-            // If the method is exactly "id" or "timestamps", skip them
-            if (in_array($method, ['id', 'timestamps'])) {
+            // Skip utility methods like id() or timestamps(), and explicit foreign key declarations.
+            if (self::shouldSkipMethod($method) || self::isExplicitForeignKey($line)) {
                 continue;
             }
 
-            // If this line is a foreign key declaration, skip it
-            if (Str::contains($line, ['foreign', 'references'])) {
-                continue;
-            }
+            $name = self::extractColumnName($line, $method);
 
-            // Extract the column name from the first parameter ("('...')")
-            $name = Str::between($line, "('", "')");
             if (empty($name)) {
                 continue;
             }
 
-            // Check whether the column is defined as nullable
-            $isNullable = Str::contains($line, 'nullable()');
-
-            // Get related data
-            $is_foreign = false;
-            $related_table = null;
-            $related_column = null;
-            foreach ($relationships as $relationship) {
-                if ($relationship['column'] == $name) {
-                    $is_foreign = true;
-                    $related_table = $relationship['on'];
-                    $related_column = $relationship['references'];
-                    break;
-                }
-            }
-
-            $columns[] = [
-                'name' => $name,
-                'type' => $method,
-                'is_nullable' => $isNullable,
-                'is_foreign' => $is_foreign,
-                'related_table' => $related_table,
-                'related_column' => $related_column,
-            ];
+            $columns[] = self::buildColumnData($line, $name, $method, $relationships);
         }
 
         return $columns;
@@ -190,6 +159,93 @@ class MigrationParser
         }
 
         return $relationships;
+    }
+
+    /**
+     * Checks if a line is a potential column definition.
+     */
+    private static function isParsableColumnLine(string $line): bool
+    {
+        return Str::startsWith($line, '$table->');
+    }
+
+    /**
+     * Extracts the method name (data type) from the column definition line.
+     */
+    private static function extractMethodName(string $line): string
+    {
+        return Str::before(Str::after($line, '$table->'), '(');
+    }
+
+    /**
+     * Determines if the method should be skipped (e.g., 'id' or 'timestamps').
+     */
+    private static function shouldSkipMethod(string $method): bool
+    {
+        return in_array($method, ['id', 'timestamps']);
+    }
+
+    /**
+     * Determines if the line is an explicit foreign key declaration.
+     */
+    private static function isExplicitForeignKey(string $line): bool
+    {
+        return Str::contains($line, ['foreign', 'references']);
+    }
+
+    /**
+     * Extracts the column name using string manipulation, handling quoted parameters.
+     */
+    private static function extractColumnName(string $line, string $method): ?string
+    {
+        // Isolate parameters: e.g., 'name',30);
+        $startOfParams = Str::after($line, '$table->' . $method . '(');
+        $quotedString = ltrim($startOfParams);
+
+        // Determine the quote type
+        if (Str::startsWith($quotedString, "'")) {
+            $quote = "'";
+        } elseif (Str::startsWith($quotedString, '"')) {
+            $quote = '"';
+        } else {
+            return null; // Cannot reliably parse the column name
+        }
+
+        // Extract the name between the first pair of quotes
+        $name = Str::between($quotedString, $quote, $quote);
+
+        return empty($name) ? null : $name;
+    }
+
+    /**
+     * Builds the final column data array, including foreign key information.
+     */
+    private static function buildColumnData(string $line, string $name, string $method, array $relationships): array
+    {
+        $isNullable = Str::contains($line, 'nullable()');
+
+        $is_foreign = false;
+        $related_table = null;
+        $related_column = null;
+
+        // Check if this column is defined as a relationship
+        foreach ($relationships as $relationship) {
+            if ($relationship['column'] == $name) {
+                $is_foreign = true;
+                $related_table = $relationship['on'];
+                $related_column = $relationship['references'];
+                break;
+            }
+        }
+
+        return [
+            'name' => $name,
+            'type' => $method,
+            'is_nullable' => $isNullable,
+            'is_foreign' => $is_foreign,
+            'related_table' => $related_table,
+            'related_column' => $related_column,
+        ];
     }
 
 }
