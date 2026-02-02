@@ -26,7 +26,7 @@
                 {{ __('skeletons.create') }}
             </a>
         </div>
-        {{ endif }}
+        {{ endif_auth }}
         <div class="col-md-6">
             @include('layouts.search', ['route' => '{{ table_name }}.search'])
         </div>
@@ -65,7 +65,7 @@
                                             {{ __('skeletons.delete') }}
                                         </button>
                                     </form>
-                                    {{ endif }}
+                                    {{ endif_auth }}
                                 </td>
                             </tr>
                         @endforeach

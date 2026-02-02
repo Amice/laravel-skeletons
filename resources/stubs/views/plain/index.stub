@@ -42,7 +42,7 @@
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger">{{ __('skeletons.delete') }}</button>
                             </form>
-                            {{ endif }}
+                            {{ endif_auth }}
                         </td>
                     </tr>
                 @endforeach
@@ -51,7 +51,7 @@
 
         <!-- Pagination Links -->
         <div class="pagination">
-            {{ ${{ plural }}->links(()) }}
+            {{ ${{ plural }}->links() }}
         </div>
     </div>
 @endsection

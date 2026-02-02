@@ -51,13 +51,14 @@ class IndexViewGenerator extends BaseViewGenerator
         }
         $rows = implode("\n", $rowsArray);
         $ifAuth = $this->withAuth ? "@if(auth()->check())" : '';
-        $endif = $this->withAuth ? "@endif" : '';
+        $endifAuth = $ifAuth ? "@endif" : '';
+
 
         $placeHolders = [
             '{{ table_headers }}' => $headers,
             '{{ table_rows }}'    => $rows,
             '{{ if_auth }}'       => $ifAuth,
-            '{{ endif }}'         => $endif,
+            '{{ endif_auth }}'         => $endifAuth,
         ];
         $content = $this->replacePlaceholders($stubContent, $placeHolders);
         $viewPath = $this->getPath(resource_path("views/{$this->tableName}"));

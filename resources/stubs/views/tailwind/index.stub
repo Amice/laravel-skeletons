@@ -20,7 +20,7 @@
            {{ __('skeletons.create') }}
         </a>
     </div>
-    {{ endif}}
+    {{ endif_auth}}
 
     <!-- Search Field -->
     @include('layouts.search', ['route' => '{{ table_name }}.search'])
@@ -61,7 +61,7 @@
                                     {{ __('skeletons.delete') }}
                                 </button>
                             </form>
-                            {{ endif }}
+                            {{ endif_auth }}
                         </td>
                     </tr>
                 @endforeach
