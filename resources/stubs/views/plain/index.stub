@@ -13,7 +13,7 @@
         <!-- Create Link -->
         {{ if_auth }}
         <a href="{{ route('{{ table_name }}.create') }}" class="btn">{{ __('skeletons.create') }}</a>
-        {{ endif }}
+        {{ endif_auth }}
 
         <!-- Search Field -->
         @include('layouts.search', ['route' => '{{ table_name }}.search'])
