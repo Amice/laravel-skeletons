@@ -20,7 +20,7 @@
            {{ __('skeletons.create') }}
         </a>
     </div>
-    {{ endif_auth}}
+    {{ endif_auth }}
 
     <!-- Search Field -->
     @include('layouts.search', ['route' => '{{ table_name }}.search'])
