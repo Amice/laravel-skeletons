@@ -243,7 +243,9 @@ class SkeletonsGenerator extends Command
 
     protected function getLogFileName(string $migrationName, bool $isApi = false): string
     {
-        return $migrationName . ($isApi ? '-api' : '') . '.json.log';
+        $fileName = $migrationName . ($isApi ? '-api' : '') . '.json.log';
+
+        return base_path('store/log/skeletons/' . $fileName);
     }
 
     /**
@@ -289,11 +291,6 @@ class SkeletonsGenerator extends Command
     {
         $targetLogFile = $this->getLogFileName($migrationName, $isApiPurge);
         $comparisonLogFile = $this->getLogFileName($migrationName, !$isApiPurge);
-
-//        $webLogFile = $logFileBase . '.log';
-//        $targetLogFile = $purgeApiOnly ? $apiLogFile : $webLogFile;
-//        $comparisonLogFile = $purgeApiOnly ? $webLogFile : $apiLogFile;
-//        $isApiPurge = $purgeApiOnly;
 
         $this->info("Purging generated files for migration: $migrationName (Target log: {$targetLogFile}, Comparison log: {$comparisonLogFile})");
 
@@ -366,166 +363,6 @@ class SkeletonsGenerator extends Command
         }
     }
 
-//    protected function purgeGeneratedFiles(string $migrationName, string $logFileBase, bool $purgeApiOnly = false): void
-//    {
-//        $targetLogFile = $this->getLogFileName($migrationName, $purgeApiOnly);
-//        $comparisonLogFile = $this->getLogFileName($migrationName, !$purgeApiOnly);
-//        $this->info("Purging generated files for migration: $migrationName (log file: {$logFile})");
-//
-//        if (!File::exists($logFile)) {
-//            $this->error("No generation log found for migration: $migrationName");
-//            return;
-//        }
-//
-//        $logData = json_decode(File::get($logFile), true);
-//        $apiOptionUsed = $logData['options']['api'] ?? false;
-//
-////            if ($purgeApiOnly && !$apiOptionUsed) {
-////                $this->info("Skipping purge of API files as they were not generated with the --api option.");
-////                return;
-////            }
-//
-//        if (!empty($logData['generated_files'])) {
-//            foreach ($logData['generated_files'] as $file) {
-//                if (Str::contains($file, 'routes')) {
-//                    RouteGenerator::removeRequireFromRoutes($file, $apiOptionUsed);
-//                }
-//                if (File::exists($file)) {
-//                    File::delete($file);
-//                    $this->info("Deleted generated file: {$file}");
-//                }
-//            }
-//        }
-//        if (!empty($logData['backup_files'])) {
-//            foreach ($logData['backup_files'] as $original => $backup) {
-//                if (File::exists($backup)) {
-//                    File::delete($backup);
-//                    $this->info("Deleted backup file: {$backup}");
-//                }
-//            }
-//        }
-//        $this->removeMenuItems($logData['menu_items'] ?? []);
-//        File::delete($logFile); // Now we can delete the specific log file
-//        $this->info("Removed log file: $logFile");
-//        $this->info("✅ Purge process is complete!");
-//    }
-
-//    protected function purgeGeneratedFiles(string $migrationName, string $logFile, bool $purgeApiOnly = false): void
-//    {
-//        $this->info("Purging generated files for migration: $migrationName");
-//
-//        $message = "No generation log found for migration: $migrationName";
-//        if (File::exists($logFile)) {
-//            $logData = json_decode(File::get($logFile), true);
-//            $generatedWithApi = $logData['options']['api'] ?? false; // Check if files were generated with --api
-//
-//            $this->info("API Option Used During Generation: " . ($generatedWithApi ? 'Yes' : 'No'));
-//            $this->info("Purge API Only Option: " . ($purgeApiOnly ? 'Yes' : 'No'));
-//
-//            // Delete generated files.
-//            if (!empty($logData['generated_files'])) {
-//                foreach ($logData['generated_files'] as $file) {
-//                    $shouldDelete = true;
-//
-//                    // If --purge --api is used, only delete files that were generated with --api.
-//                    if ($purgeApiOnly && !$generatedWithApi) {
-//                        $shouldDelete = false;
-//                        $this->info("Skipping deletion of: {$file} (not generated with --api)");
-//                    }
-//
-//                    if ($shouldDelete) {
-//                        if (Str::contains($file, 'routes')) {
-//                            RouteGenerator::removeRequireFromRoutes($file, $generatedWithApi);
-//                        }
-//                        if (File::exists($file)) {
-//                            File::delete($file);
-//                            $this->info("Deleted generated file: {$file}");
-//                        }
-//                    }
-//                }
-//            }
-//            // Delete backup files.
-//            if (!empty($logData['backup_files'])) {
-//                foreach ($logData['backup_files'] as $original => $backup) {
-//                    $shouldDelete = true;
-//
-//                    // If --purge --api is used, only delete backups of files generated with --api.
-//                    // We might not have a direct flag for backups, so we can try to infer based on the original filename.
-//                    // This might need more sophisticated logic depending on how you create backups.
-//                    if ($purgeApiOnly && !$generatedWithApi) {
-//                        $shouldDelete = false;
-//                        $this->info("Skipping deletion of backup: {$backup} (original not generated with --api)");
-//                    }
-//
-//                    if ($shouldDelete && File::exists($backup)) {
-//                        File::delete($backup);
-//                        $this->info("Deleted backup file: {$backup}");
-//                    }
-//                }
-//            }
-//            // Delete menu items.
-//            if ($purgeApiOnly && !$generatedWithApi) {
-//                $this->info("Skipping menu item removal (not generated with --api)");
-//            } else {
-//                $this->removeMenuItems($logData['menu_items']);
-//            }
-//
-//            // Remove the log file after purge.
-//            File::delete($logFile);
-//            $message = "Removed log file: $logFile";
-//        }
-//        $this->info($message);
-//
-//        // Additionally, clean up any stray .bak files in the project.
-//        // $this->cleanupBakFiles();
-//
-//        $this->info("✅ Purge process is complete!");
-//    }
-
-    //    protected function purgeGeneratedFiles(string $migrationName, string $logFile): void
-//    {
-//        $this->info("Purging all generated files for migration: $migrationName");
-//
-//        $message = "No generation log found for migration: $migrationName";
-//        if (File::exists($logFile)) {
-//            $logData = json_decode(File::get($logFile), true);
-//            $apiOptionUsed = $logData['options']['api'] ?? false; // Default to false if option not found
-//
-//            // Delete generated files.
-//            if (!empty($logData['generated_files'])) {
-//                foreach ($logData['generated_files'] as $file) {
-//                    if (Str::contains($file, 'routes')) {
-//                        RouteGenerator::removeRequireFromRoutes($file, $apiOptionUsed);
-//                    }
-//                    if (File::exists($file)) {
-//                        File::delete($file);
-//                        $this->info("Deleted generated file: {$file}");
-//                    }
-//                }
-//            }
-//            // Delete backup files.
-//            if (!empty($logData['backup_files'])) {
-//                foreach ($logData['backup_files'] as $original => $backup) {
-//                    if (File::exists($backup)) {
-//                        File::delete($backup);
-//                        $this->info("Deleted backup file: {$backup}");
-//                    }
-//                }
-//            }
-//            // Delete menu items.
-//            $this->removeMenuItems($logData['menu_items']);
-//            // Remove the log file after purge.
-//            File::delete($logFile);
-//            $message = "Removed log file: $logFile";
-//        }
-//        $this->info($message);
-//
-//        // Additionally, clean up any stray .bak files in the project.
-////        $this->cleanupBakFiles();
-//
-//        $this->info("✅ Purge process is complete!");
-//    }
-
     /**
      * Save the generation log for the given migration.
      *
@@ -570,119 +407,6 @@ class SkeletonsGenerator extends Command
         File::put($logFile, json_encode($finalLogData, JSON_PRETTY_PRINT));
         $this->info("✅ Generation log saved to {$logFile}");
     }
-
-    //    protected function saveGenerationLog(string $migrationName, string $logFile): void
-//    {
-//        // Initialize the new log data structure
-//        $newLogData = [
-//            'web' => [
-//                'generated_files' => $this->allGeneratedFiles['web']['generated_files'] ?? [],
-//                'backup_files' => $this->allGeneratedFiles['web']['backup_files'] ?? [],
-//                'menu_items' => $this->allGeneratedFiles['web']['menu_items'] ?? [],
-//            ],
-//            'api' => [
-//                'generated_files' => $this->allGeneratedFiles['api']['generated_files'] ?? [],
-//                'backup_files' => $this->allGeneratedFiles['api']['backup_files'] ?? [],
-//            ],
-//            'options' => [
-//                'api' => $this->option('api'),
-//                'with-auth' => $this->option('with-auth'),
-//                // Add other relevant options if needed
-//            ],
-//        ];
-//
-//        $finalLogData = $newLogData;
-//
-//        // If the log file exists, merge its data with the new one.
-//        if (File::exists($logFile)) {
-//            $existing = json_decode(File::get($logFile), true);
-//            if (!is_array($existing)) {
-//                $existing = [
-//                    'web' => ['generated_files' => [], 'backup_files' => [], 'menu_items' => []],
-//                    'api' => ['generated_files' => [], 'backup_files' => []],
-//                    'options' => [],
-//                ];
-//            }
-//
-//            // Merge web data
-//            $existing['web']['generated_files'] = array_values(array_unique(array_merge(
-//                $existing['web']['generated_files'] ?? [],
-//                $newLogData['web']['generated_files'] ?? []
-//            )));
-//            $existing['web']['backup_files'] = array_values(array_unique(array_merge(
-//                $existing['web']['backup_files'] ?? [],
-//                $newLogData['web']['backup_files'] ?? []
-//            )));
-//            $existing['web']['menu_items'] = array_values(array_unique(array_merge(
-//                $existing['web']['menu_items'] ?? [],
-//                $newLogData['web']['menu_items'] ?? []
-//            )));
-//
-//            // Merge api data
-//            $existing['api']['generated_files'] = array_values(array_unique(array_merge(
-//                $existing['api']['generated_files'] ?? [],
-//                $newLogData['api']['generated_files'] ?? []
-//            )));
-//            $existing['api']['backup_files'] = array_values(array_unique(array_merge(
-//                $existing['api']['backup_files'] ?? [],
-//                $newLogData['api']['backup_files'] ?? []
-//            )));
-//
-//            // Keep the options from the latest generation
-//            $existing['options'] = $newLogData['options'];
-//
-//            $finalLogData = $existing;
-//        }
-//
-//        // Save the merged log back to the file.
-//        File::ensureDirectoryExists(File::dirname($logFile));
-//        File::put($logFile, json_encode($finalLogData, JSON_PRETTY_PRINT));
-//        $this->info("Generation log updated: {$logFile}");
-//    }
-    //    protected function saveGenerationLog(string $migrationName, string $logFile): void
-//    {
-//        // Get current generation log data.
-//        $newLogData = $this->allGeneratedFiles;
-//        $finalLogData = $newLogData;
-//
-//        // Add the command options to the new log data
-//        $newLogData['options'] = [
-//            'api' => $this->option('api'),
-//            'with-auth' => $this->option('with-auth'),
-//            // Add other relevant options if needed
-//        ];
-//
-//        // If the log file exists, merge its data with the new one.
-//        if (File::exists($logFile)) {
-//            $existing = json_decode(File::get($logFile), true);
-//            if (!is_array($existing)) {
-//                $existing = [
-//                    'generated_files' => [],
-//                    'backup_files'    => [],
-//                    'options' => [], // Initialize options if not present
-//                ];
-//            }
-//
-//            // Merge generated and backup files and remove duplicates.
-//            $mergedGeneratedFiles = array_merge($existing['generated_files'], $newLogData['generated_files']);
-//            $mergedBackupFiles    = array_merge($existing['backup_files'], $newLogData['backup_files']);
-//
-//            $existing['generated_files'] = array_values(array_unique($mergedGeneratedFiles));
-//            $existing['backup_files']    = array_values(array_unique($mergedBackupFiles));
-//
-//            // Keep the options from the latest generation
-//            $existing['options'] = $newLogData['options'];
-//
-//            $finalLogData = $existing;
-//        } else {
-//            $finalLogData['options'] = $newLogData['options'];
-//        }
-//
-//        // Save the merged log back to the file.
-//        File::ensureDirectoryExists(File::dirname($logFile));
-//        File::put($logFile, json_encode($finalLogData, JSON_PRETTY_PRINT));
-//        $this->info("Generation log updated: {$logFile}");
-//    }
 
     private function removeMenuItem(string $navFilePath, string $content, string $menuItem): void
     {
