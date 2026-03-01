@@ -20,6 +20,8 @@ abstract class AbstractGenerator
     protected $columns;       // Columns data from migration
     protected $relationships; // Relationships data from migration
     protected $modelName;     // Model name
+    protected $belongsTo;
+    protected $hasMany;
     protected $singular;
     protected $plural;
     protected $isApi = false;
@@ -40,6 +42,8 @@ HEADER;
         $this->tableName = $parsedData['tableName'];
         $this->columns = $parsedData['columns'];
         $this->relationships = $parsedData['relationships'];
+        $this->belongsTo = $parsedData['belongs_to'] ?? [];
+        $this->hasMany = $parsedData['has_many'] ?? [];
         $this->modelName = $this->getModelName($this->tableName);
         $this->singular = Str::camel($this->modelName);
         $this->plural = Str::camel($this->tableName);

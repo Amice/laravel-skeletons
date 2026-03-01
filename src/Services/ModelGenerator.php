@@ -18,7 +18,7 @@ class ModelGenerator extends AbstractGenerator
         }
 
         // Prepare replacements for placeholders.
-        $fillable = "'" . implode("', '", array_column($this->columns, 'name')) . "'";
+        $fillable = $this->getFillable();
         $relationshipsCode = $this->generateRelationshipsCode($this->relationships);
         $primaryKey = isset($this->primaryKey) && $this->primaryKey !== 'id'
             ? "\nprotected \$primaryKey = '{$this->primaryKey}';\n"
@@ -130,4 +130,8 @@ class ModelGenerator extends AbstractGenerator
         return substr($modelContent, 0, $position) . "\n" . $relationshipCode . "\n" . substr($modelContent, $position);
     }
 
+    private function getFillable(): string
+    {
+        return  "'" . implode("', '", array_column($this->columns, 'name')) . "'";
+    }
 }

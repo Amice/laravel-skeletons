@@ -89,6 +89,10 @@ class RequestGenerator extends AbstractGenerator
             if (!$column['is_nullable']) {
                 $rule[] = 'required';
             }
+            if ($column['is_foreign']) {
+                $relatedTable = $column['related_table'];
+                $rule[] = "exists:$relatedTable,id";
+            }
 
             // Add type-based rules.
             switch ($column['type']) {

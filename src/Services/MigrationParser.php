@@ -4,6 +4,8 @@ namespace KovacsLaci\LaravelSkeletons\Services;
 
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use ReflectionClass;
+use Illuminate\Database\Schema\Blueprint;
 
 class MigrationParser
 {
@@ -101,9 +103,9 @@ class MigrationParser
 
         $columns = [];
         foreach ($lines as $line) {
-            $line = Str::of($line)->trim();
+            $line = Str::of($line)->trim()->value(); // Remove whitespace
 
-            if (!self::isParsableColumnLine($line)) {
+            if (empty($line) || !self::isParsableColumnLine($line)) {
                 continue;
             }
 
@@ -126,48 +128,131 @@ class MigrationParser
         return $columns;
     }
 
-    public static function extractRelationships(string $content): array
-    {
-        // Break the content into lines
-        $lines = Str::of($content)->explode("\n");
+   public static function extractRelationships(string $content): array
+   {
+       // Break the content into lines
+       $lines = Str::of($content)->explode("\n");
 
-        $relationships = [];
-        foreach ($lines as $line) {
-            $line = Str::of($line)->trim(); // Remove whitespace
+       $relationships = [];
+       foreach ($lines as $line) {
+            $line = Str::of($line)->trim()->value(); // Remove whitespace
+            if (!Str::startsWith($line, '$table->foreign')) {
+                continue; // Skip lines that don't define foreign keys
+            }
 
-            // Check if the line defines a relationship
-            if (Str::contains($line, '$table->foreign') && Str::contains($line, '->references') && Str::contains($line, '->on')) {
-                // Extract the column name inside foreign('...')
-                $columnStart = Str::after($line, '$table->foreign(');
-                $column = Str::of(Str::before($columnStart, ')'))->replace("'", '')->trim();
+            if (Str::startsWith($line, '$table->foreign(')) {
+                $rel = self::parseClassicForeign($line);
+                if ($rel) {
+                    $relationships[] = $rel;
+                }
+            }
 
-                // Extract the referenced column
-                $referencesStart = Str::after($line, "->references('");
-                $references = Str::before($referencesStart, "')");
-
-                // Extract the referenced table
-                $onStart = Str::after($line, "->on('");
-                $on = Str::before($onStart, "')");
-
-                // Add the relationship to the array
-                $relationships[] = [
-                    'column' => $column,
-                    'references' => $references,
-                    'on' => $on,
-                ];
+            if (Str::startsWith($line, '$table->foreignId(')) {
+                $rel = self::parseConstrainedForeignId($line);
+                if ($rel) {
+                    $relationships[] = $rel;
+                }
             }
         }
+        
 
-        return $relationships;
-    }
+       return $relationships;
+   }
+
+   private static function parseClassicForeign(string $line): ?array
+   {
+        $result = [];
+        // Check if the line defines a relationship
+        if (Str::contains($line, '$table->foreign(') && Str::contains($line, '->references') && Str::contains($line, '->on')) {
+            // Extract the column name inside foreign('...')
+            $columnStart = Str::after($line, '$table->foreign(');
+            $column = Str::of(Str::before($columnStart, ')'))->replace("'", '')->trim()->value();
+
+            // Extract the referenced column
+            $referencesStart = Str::after($line, "->references('");
+            $references = Str::before($referencesStart, "')");
+
+            // Extract the referenced table
+            $onStart = Str::after($line, "->on('");
+            $on = Str::before($onStart, "')");
+
+            // Add the relationship to the array
+            $result = [
+                'column' => $column,
+                'references' => $references,
+                'on' => $on,
+            ];
+        }
+
+        return $result;
+   }
+
+   private static function parseConstrainedForeignId(string $line): ?array
+   {
+        $result = [];
+        $columnStart = Str::after($line, '$table->foreignId(');
+        $column = Str::of(Str::before($columnStart, ')'))->replace("'", '')->trim()->value();
+
+        // Extract the referenced column
+        $references = 'id';
+
+        // Extract the referenced table
+        if (Str::contains($line, "constrained('")) {
+            $onStart = Str::after($line, "->constrained('");
+            $on = Str::before($onStart, "')");
+        } 
+        else {
+            // If no constrained('table') is specified, infer the table name from the column name
+            $on = Str::of($column)
+                ->replace('_id', '')
+                ->plural()
+                ->toString();
+        }
+
+        // Add the relationship to the array
+        $result = [
+            'column' => $column,
+            'references' => $references,
+            'on' => $on,
+        ]; 
+
+        return $result;
+   }
 
     /**
      * Checks if a line is a potential column definition.
      */
     private static function isParsableColumnLine(string $line): bool
     {
-        return Str::startsWith($line, '$table->');
+        if (!Str::startsWith(trim($line), '$table->')) {
+            return false;
+        }
+
+        $method = self::extractMethodName($line);
+
+        return in_array($method, self::getValidColumnMethods(), true);
     }
+
+
+    private static function getValidColumnMethods(): array
+    {
+        $class = new ReflectionClass(Blueprint::class);
+
+        return collect($class->getMethods())
+            ->filter(function ($m) {
+                $params = $m->getParameters();
+                if (count($params) === 0) {
+                    return false;
+                }
+                $first = $params[0]->getName();
+                return in_array($first, ['column', 'name']);
+            })
+            ->pluck('name')
+            ->values()
+            ->all();
+    }
+
+
 
     /**
      * Extracts the method name (data type) from the column definition line.
@@ -190,32 +275,62 @@ class MigrationParser
      */
     private static function isExplicitForeignKey(string $line): bool
     {
-        return Str::contains($line, ['foreign', 'references']);
+        $line = trim($line);
+
+        // foreignId, foreignUuid, foreignUlid → oszlopdefiníciók
+        if (Str::startsWith($line, '$table->foreign')) {
+            return false;
+        }
+        if (Str::startsWith($line, '$table->foreignUuid(')) {
+            return false;   
+        } 
+        if (Str::startsWith($line, '$table->foreignUlid(')) {
+            return false;
+        }
+        // foreign() → explicit FK
+        return Str::startsWith($line, '$table->foreign');
     }
+
 
     /**
      * Extracts the column name using string manipulation, handling quoted parameters.
      */
     private static function extractColumnName(string $line, string $method): ?string
     {
-        // Isolate parameters: e.g., 'name',30);
-        $startOfParams = Str::after($line, '$table->' . $method . '(');
-        $quotedString = ltrim($startOfParams);
-
-        // Determine the quote type
-        if (Str::startsWith($quotedString, "'")) {
-            $quote = "'";
-        } elseif (Str::startsWith($quotedString, '"')) {
-            $quote = '"';
-        } else {
-            return null; // Cannot reliably parse the column name
+        // Keressük a metódushívást
+        $call = '$table->' . $method . '(';
+        $pos = strpos($line, $call);
+        if ($pos === false) {
+            return null;
         }
 
-        // Extract the name between the first pair of quotes
-        $name = Str::between($quotedString, $quote, $quote);
+        // A hívás utáni rész
+        $after = substr($line, $pos + strlen($call));
 
-        return empty($name) ? null : $name;
+        // Az első idézőjel pozíciója (lehet ' vagy ")
+        $firstQuotePos = strcspn($after, '\'"');
+        $quote = $after[$firstQuotePos] ?? null;
+
+        if ($quote !== '"' && $quote !== "'") {
+            return null;
+        }
+
+        // A mezőnév kezdete
+        $start = $firstQuotePos + 1;
+
+        // A záró idézőjel pozíciója
+        $end = strpos($after, $quote, $start);
+        if ($end === false) {
+            return null;
+        }
+
+        // A mezőnév
+        $name = substr($after, $start, $end - $start);
+        $name = trim($name);
+
+        return $name !== '' ? $name : null;
     }
+
 
     /**
      * Builds the final column data array, including foreign key information.

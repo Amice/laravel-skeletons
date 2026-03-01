@@ -33,7 +33,6 @@ class ControllerGenerator extends AbstractGenerator
      * @return null
      * @throws \Exception If any issues occur that require halting the process.
      */
-
     public function generate(): ?array
     {
         $stubFileName = $this->isApi ? self::stub_path('api/controller.stub') :  self::stub_path('controller.stub');
@@ -54,13 +53,14 @@ class ControllerGenerator extends AbstractGenerator
         $relatedData = ''; // Stores data fetching code
         $relatedCompactCreate = []; // Array to store compact variables for create method
         $relatedCompactEdit = "'{$this->singular}'"; // Always include main model in edit method
-        $relatedModels = [];
+        $withString = $this->getWithString();
+        // $relatedModels = [];
         foreach ($this->columns as $column) {
             if (!empty($column['is_foreign'])) {
                 // Convert related table name into model and variable names
                 $relatedModel = self::getModelName($column['related_table']);
                 $relatedVariable = Str::camel(Str::plural($column['related_table'])); // Variable name (e.g., schoolClasses)
-
+                
                 $useStatements[] = "use App\Models\\{$relatedModel};";
                 $relatedData .= "\n        \$$relatedVariable = $relatedModel::all();";
 
@@ -83,6 +83,7 @@ class ControllerGenerator extends AbstractGenerator
         $placeholders = [
             '{{ className }}' => $className,
             '{{ useStatements }}' => $useStatementsString,
+            '{{ with }}' => $withString ?? '',
             '{{ relatedData }}' => $relatedData,
             '{{ relatedCompactCreate }}' => $relatedCompactCreateString,
             '{{ relatedCompactEdit }}' => $relatedCompactEdit,
@@ -101,6 +102,29 @@ class ControllerGenerator extends AbstractGenerator
             'generated_files' => $this->generatedFiles,
             'backup_files'    => $this->backupFiles,
         ];
+    }
+
+    private function getWithString(): string
+    {
+        $result = '';
+        if (!empty($this->belongsTo)) {
+            foreach ($this->belongsTo as $relationship) {
+                $methodName = $relationship['method_name'];
+                $result .= "with('$methodName')->";
+            }
+            return $result;
+        }
+        
+         if (!empty($this->hasMany)) {
+             foreach ($this->hasMany as $relationship) {
+                 $methodName = $relationship['method_name'];
+                 $result .= "with('$methodName')->";
+             }
+        }     
+
+        return $result;
+    
+           
     }
 
 }

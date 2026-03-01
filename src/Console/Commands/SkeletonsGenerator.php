@@ -115,7 +115,7 @@ class SkeletonsGenerator extends Command
 
         // Process the migration file to build a collection of entities.
         $entities = MigrationParser::processMigrationFile($migrationFilePath[0]);
-
+        $entities = $this->addHasManyBelongsTo($entities);
         try {
             // Phase 0: copying language files.
             $copiedFiles = TranslationsGenerator::copySkeletonsLangFiles();
@@ -245,7 +245,7 @@ class SkeletonsGenerator extends Command
     {
         $fileName = $migrationName . ($isApi ? '-api' : '') . '.json.log';
 
-        return base_path('store/log/skeletons/' . $fileName);
+        return base_path(str_replace('/', DIRECTORY_SEPARATOR,'storage/logs/skeletons/' . $fileName));
     }
 
     /**
@@ -446,4 +446,45 @@ class SkeletonsGenerator extends Command
 
         return $cssStyle;
     }
+
+    private function addHasManyBelongsTo(array $entities): array
+    {
+        // belongs_to és has_many kulcsok előkészítése
+        foreach ($entities as $tableName => &$table) {
+            $table['belongs_to'] = $table['belongs_to'] ?? [];
+            $table['has_many'] = $table['has_many'] ?? [];
+        }
+        unset($table);
+
+        // Kapcsolatok feldolgozása
+        foreach ($entities as $tableName => $table) {
+
+            foreach ($table['relationships'] as $rel) {
+
+                $localColumn   = $rel['column'];
+                $foreignTable  = $rel['on'];
+                $foreignColumn = $rel['references'];
+
+                // BELONGS TO
+                $entities[$tableName]['belongs_to'][] = [
+                    'related_table' => $foreignTable,
+                    'local_key'     => $localColumn,
+                    'foreign_key'   => $foreignColumn,
+                    'method_name'   => Str::camel(Str::singular($foreignTable)),
+                ];
+
+                // HAS MANY
+                $entities[$foreignTable]['has_many'][] = [
+                    'related_table' => $tableName,
+                    'foreign_key'   => $localColumn,
+                    'local_key'     => $foreignColumn,
+                    'method_name'   => Str::camel(Str::plural($tableName)),
+                ];
+            }
+        }
+
+        return $entities;
+    }
+
+
 }
